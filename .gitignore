@@ -163,3 +163,14 @@ pip-wheel-metadata/
 build/
 test_results/
 script.py
+
+
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+
+.bokeh
+node_modules
+examples/awesome-panel/

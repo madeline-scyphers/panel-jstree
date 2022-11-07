@@ -1,0 +1,12 @@
+{
+  "name": "panel_jstree",
+  "version": "0.0.1",
+  "description": "jsTree",
+  "license": "MIT",
+  "keywords": [],
+  "repository": {},
+  "dependencies": {
+    "@bokeh/bokehjs": "^2.4.3",
+    "@holoviz/panel": "^0.14.0"
+  }
+}
