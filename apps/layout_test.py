@@ -37,7 +37,7 @@ def view():
     #     )
 
 
-    ft = FileTree(sizing_mode="stretch_both")
+    ft = FileTree("/Users/madelinescyphers/Documents/projs_.nosync/panel-jstree", sizing_mode="stretch_both")
     checkboxes2 = pn.widgets.ToggleGroup(options=["a", "b", "c"],)
     # slider = pn.widgets.IntSlider(name='Number of observations', value=500, start=0, end=2000)
 
