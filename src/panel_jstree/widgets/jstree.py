@@ -50,8 +50,6 @@ class _jsTreeBase(Widget):
 
     checkbox = param.Boolean(default=True, doc="Whether to to use checkboxes as selectables")
 
-    select_only_leaves = param.Boolean(default=False, doc="")  # TODO fill this in
-
     plugins = param.List(doc="Selected callback data")
 
     url = param.String(doc="ajax url")  # TODO figure out how to just get the url
@@ -64,23 +62,6 @@ class _jsTreeBase(Widget):
 
     _widget_type: ClassVar[Type[Model]] = jsTreePlot
 
-    # def _get_model(self, doc, root=None, parent=None, comm=None):
-    #     if self._widget_type is not None:
-    #         pass
-    #     elif "panel.models.jstree" not in sys.modules:
-    #         if isinstance(comm, JupyterComm):
-    #             self.param.warning(
-    #                 "jsTreePlot was not imported on instantiation "
-    #                 "and may not render in a notebook. Restart "
-    #                 "the notebook kernel and ensure you load "
-    #                 "it as part of the extension using:"
-    #                 "\n\npn.extension('jstree')\n"
-    #             )
-    #         from ..models.jstree import jsTreePlot
-    #
-    #     else:
-    #         jsTreePlot = getattr(sys.modules["panel.models.jstree"], "jsTreePlot")
-    #
     def _process_param_change(self, msg: dict[str, Any]) -> dict[str, Any]:
         """
         Transform parameter changes into bokeh model property updates.
@@ -134,11 +115,6 @@ class FileTree(_jsTreeBase):
         super().__init__(**params)
         self.data = self._get_child_json(self.directory, depth=1)
         self.param.watch(self._add_node_children, "_last_opened")
-        self.param.watch(self._print_value, "value")
-
-    def _print_value(self, *events):
-        print(self.value)
-
 
     def _add_node_children(self, event: param.parameterized.Event = None):
         new_nodes = []

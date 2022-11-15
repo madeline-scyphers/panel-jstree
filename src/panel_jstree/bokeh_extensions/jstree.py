@@ -19,6 +19,7 @@ extension._imports["jsme"] = "panel_chemistry.bokeh_extensions.jsme_editor"
 
 
 TS_CODE =r"""
+// @ts-nocheck
 import * as p from "core/properties"
 // import { HTMLBox, HTMLBoxView } from "models/layouts/html_box"  // duplicated below for now
 import { div } from "core/dom"
@@ -38,7 +39,7 @@ import {HTMLBox, HTMLBoxView} from "models/layouts/html_box"
 
 const JSTREE_DIV_STYLES: {[key: string]: string} = {
     overflow:"scroll", 
-    border:"1px solid silver", 
+    // border:"1px solid silver", 
     minHeight:"100px", 
 }
 // this one is copy pasted from vtk utils
@@ -268,7 +269,13 @@ export class jsTreePlotView extends PanelHTMLBoxView {
         //if (!(this._container === this.el.childNodes[0]))
         applyStyle(this.el, JSTREE_DIV_STYLES)
         this.el.appendChild(this._container);
-    
+        
+        let kw = {}
+        if (!this.model.multiple) {
+            kw = {"checkbox": {
+                        "three_state": false,
+                        "cascade": "undetermined"}}
+        }
 
         this._jstree = jQuery('#'+this._id).jstree(
             { "core": 
@@ -280,12 +287,13 @@ export class jsTreePlotView extends PanelHTMLBoxView {
                   }
                 }, 
                 "plugins": this.model.plugins, 
+                ...kw
             }
             );
-
-          // jQuery('#'+this._id).jstree({ "core": { "data": this.model.data, "check_callback": true}, plugins: this.model.plugins});
-          jQuery('#'+this._id).on('changed.jstree', (e: any, data: any) => this._update_code_from_editor(e, data));
-          jQuery('#'+this._id).on('before_open.jstree', (e: any, data: any) => this._listen_for_node_open(e, data));
+        
+        // jQuery('#'+this._id).jstree({ "core": { "data": this.model.data, "check_callback": true}, plugins: this.model.plugins});
+        jQuery('#'+this._id).on('changed.jstree', (e: any, data: any) => this._update_code_from_editor(e, data));
+        jQuery('#'+this._id).on('before_open.jstree', (e: any, data: any) => this._listen_for_node_open(e, data));
 
     }
     //
@@ -310,17 +318,7 @@ export class jsTreePlotView extends PanelHTMLBoxView {
     // }
 
     _update_code_from_editor({}, data: any): void {
-        let value = []
-        if (this.model.select_only_leaves){
-            let selected = data.instance.get_selected({full: true});
-            for (let node of selected){
-                if (data.instance.is_leaf(node)){
-                    value.push(node.id)
-            }}
-        } else {
-            value = data.instance.get_selected();
-        }
-        this.model.value = value;
+        this.model.value = data.instance.get_selected();
     }
 
     _update_tree_from_new_nodes(): void {
@@ -369,7 +367,6 @@ export namespace jsTreePlot {
         multiple: p.Property<boolean>
         show_icons: p.Property<boolean>
         show_dots: p.Property<boolean>
-        select_only_leaves: p.Property<boolean>
         value: p.Property<any>
         url: p.Property<string>
         _last_opened: p.Property<any>
@@ -396,7 +393,6 @@ export class jsTreePlot extends HTMLBox {
         multiple:      [ Boolean, true ],
         show_icons:    [ Boolean, true ],
         show_dots:     [ Boolean, true ],
-        select_only_leaves: [ Boolean, false ],
         url: [ String, "" ],
         _last_opened: [ Any, {} ],
         _new_nodes: [ Any, {} ]
@@ -450,7 +446,6 @@ class jsTreePlot(HTMLBox):
     multiple = Bool(default=True)
     show_icons = Bool(default=True)
     show_dots = Bool(default=True)
-    select_only_leaves = Bool(default=False)
     url = String()
     _last_opened = Any()
     _new_nodes = Any()
