@@ -75,7 +75,6 @@ class _jsTreeBase(Widget):
             properties["height"] = 400
         if properties.get("height") and properties["height"] < 100:
             properties["height"] = 100
-            properties['min_height'] = 100
 
         checkbox = properties.pop("checkbox", None)
         if checkbox:

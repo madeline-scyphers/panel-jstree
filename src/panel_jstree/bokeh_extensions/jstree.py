@@ -38,9 +38,14 @@ import {MarkupView} from "models/widgets/markup"
 import {HTMLBox, HTMLBoxView} from "models/layouts/html_box"
 
 const JSTREE_DIV_STYLES: {[key: string]: string} = {
-    overflow:"scroll", 
+    overflow: "auto",
+    // height: "auto",
+    // width: "auto",
+    
     // border:"1px solid silver", 
-    minHeight:"100px", 
+    minHeight:"200px",
+    minWidth:"200px",
+     
 }
 // this one is copy pasted from vtk utils
 export function applyStyle(el: HTMLElement, style: {[key: string]: string}) {
@@ -260,14 +265,16 @@ export class jsTreePlotView extends PanelHTMLBoxView {
         console.log(this._id)
     
         // this._container = div({id: this._id})
-        this._container = div({id: this._id})
+        this._container = div({id: this._id, })
         // applyStyle(this._container, JSTREE_DIV_STYLES)
      
     
         // this._jstree = jQuery('#'+this._id).jstree({ "core": { "data": this.model.data, "check_callback": true}, plugins: this.model.plugins});
+        // applyStyle(this.el, JSTREE_DIV_STYLES)
+        applyStyle(this._container, JSTREE_DIV_STYLES)
         set_size(this._container, this.model)
+        // set_size(this.el, this.model)
         //if (!(this._container === this.el.childNodes[0]))
-        applyStyle(this.el, JSTREE_DIV_STYLES)
         this.el.appendChild(this._container);
         
         let kw = {}
