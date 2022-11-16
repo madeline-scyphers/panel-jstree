@@ -134,7 +134,7 @@ class FileTree(_jsTreeBase):
                     if node.get("children"):
                         transverse(node["children"], value)
                     else:
-                        node["children"] = self._get_child_json(node["id"], add_parent=True, state={"opened": True})
+                        node["children"] = self._get_child_json(node["id"], add_parent=True, state={"opened": True}, depth=2)
                         [transverse([n], value) for n in node["children"] if Path(n["id"]) in parents]
                     break
 
