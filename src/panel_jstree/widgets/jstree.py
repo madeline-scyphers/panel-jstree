@@ -58,9 +58,16 @@ class _jsTreeBase(Widget):
 
     _new_nodes = param.List(doc="Children to push to tree")
 
+    _flat_tree = param.List(doc="Flat representation of tree")
+
     _rename = {"select_multiple": "multiple"}
 
     _widget_type: ClassVar[Type[Model]] = jsTreePlot
+
+    @property
+    def flat_tree(self):
+        return self._flat_tree
+
 
     def _process_param_change(self, msg: dict[str, Any]) -> dict[str, Any]:
         """
@@ -114,18 +121,67 @@ class FileTree(_jsTreeBase):
         super().__init__(**params)
         self.data = self._get_child_json(self.directory, depth=1)
         self.param.watch(self._add_node_children, "_last_opened")
+        self.param.watch(self._new_nodes_on_value_update, "value")
 
-    def _add_node_children(self, event: param.parameterized.Event = None):
+    def _new_nodes_on_value_update(self, event):
+        print(self.value)
+
+        def transverse(d: list, value):
+            paths = list(reversed((value, *Path(value).parents)))
+            for i, path in enumerate(paths):
+                if not (Path(self.directory) in Path(path).parents):
+                    continue
+                for node in d:
+                    if path == Path(node["id"]):
+                        if node.get("children"):
+                            node["state"] = {"opened": True}
+                            transverse(node["children"], value)
+                        else:
+                            children = self._get_child_json(str(path), add_parent=True, state={"opened": True})
+                            # children[1]["state"]["selected"] = True
+                            # for l, child in enumerate(children):
+                            #     if Path(value) == Path(child["id"]):
+                            #         children[0]["state"] = {"selected": True}
+
+                            node["children"] = children
+                            if "opened" not in node.get("state", {}) or node["state"]["opened"] is False:
+                                state = node.get("state", {})
+                                state["opened"] = True
+                                node["state"] = state
+                            if i < len(paths) - 1:
+                                for n in node["children"]:
+                                    if paths[i+1] == Path(n["id"]):
+                                        transverse([n], value)
+                        break
+        ids = [node["id"] for node in self._flat_tree]
+        values = [value for value in self.value if value not in ids]
+        if values:
+            data = copy.deepcopy(self.data)
+            for value in values:
+                transverse(data, value)
+            self.data = copy.deepcopy(data)
+        # /Users/madelinescyphers/Documents/projs_.nosync/panel-jstree/tests/__pycache__/__init__.cpython-39.pyc
+        # /Users/madelinescyphers/Documents/projs_.nosync/panel-jstree/examples/awesome-panel/awesome-panel-cli/widgets/viewer.py
+    def _add_node_children(self, event: param.parameterized.Event = None, dirs = None, **kwargs):
         new_nodes = []
-        dirs = event.new["children"]
-        nodes_already_sent = event.new.get("children_d", [])
+        kw = {}
+        if not dirs:
+            if event:
+                nodes_already_sent = event.new.get("children_d", [])
+                dirs = event.new["children"]
+                kw = dict(add_parent=True, children_to_skip=nodes_already_sent, )
+            else:
+                dirs = [self.directory]
+                kw = dict(depth=1)
         for dir_ in dirs:
-            children = self._get_child_json(dir_, add_parent=True, children_to_skip=nodes_already_sent)
+            children = self._get_child_json(dir_, **{**kwargs, **kw})
             if children:
                 new_nodes.extend(children)
         self._new_nodes = new_nodes
 
-    def _get_child_json(self, directory: str, add_parent=False, depth=0, children_to_skip=()):
+
+    def _get_child_json(self, directory: str, add_parent=False, depth=0, children_to_skip=(), **kwargs):
+        directory = str(directory)
         parent = directory if add_parent else None
         jsn = []
         if not os.path.isdir(directory):
@@ -136,8 +192,8 @@ class FileTree(_jsTreeBase):
                 children = self._get_child_json(dir, add_parent=add_parent, depth=depth - 1)
             else:
                 children = None
-            jsn.append(self._get_json(dir, parent=parent, children=children, icon=self._folder_icon))
-        jsn.extend(self._get_json(file, parent=parent, icon=self._file_icon) for file in files)
+            jsn.append(self._get_json(dir, parent=parent, children=children, icon=self._folder_icon, **kwargs))
+        jsn.extend(self._get_json(file, parent=parent, icon=self._file_icon, **kwargs) for file in files)
         return jsn
 
     @staticmethod
@@ -147,8 +203,8 @@ class FileTree(_jsTreeBase):
         files = [f for f in files if f not in children_to_skip]
         return dirs, files
 
-    def _get_json(self, txt, parent: str = None, children: Optional[list] = None, icon: str = None):
-        jsn = dict(id=txt, text=Path(txt).name)
+    def _get_json(self, txt, parent: str = None, children: Optional[list] = None, icon: str = None, **kwargs):
+        jsn = dict(id=txt, text=Path(txt).name, **kwargs)
         if parent:
             jsn["parent"] = parent
         if children:

@@ -18,7 +18,7 @@ extension._imports["jsme"] = "panel_chemistry.bokeh_extensions.jsme_editor"
 # pylint: enable=protected-access
 
 
-TS_CODE =r"""
+TS_CODE = r"""
 // @ts-nocheck
 import * as p from "core/properties"
 // import { HTMLBox, HTMLBoxView } from "models/layouts/html_box"  // duplicated below for now
@@ -251,6 +251,7 @@ export class jsTreePlotView extends PanelHTMLBoxView {
     connect_signals(): void {
         super.connect_signals()
         this.connect(this.model.properties.data.change, () => this._update_tree_from_data())
+        this.connect(this.model.properties.value.change, () => this._update_selection_from_value())
         this.connect(this.model.properties._new_nodes.change, () => this._update_tree_from_new_nodes())
         this.connect(this.model.properties.show_icons.change, () => this._update_tree_theme_from_model())
         this.connect(this.model.properties.show_dots.change, () => this._update_tree_theme_from_model())
@@ -301,6 +302,8 @@ export class jsTreePlotView extends PanelHTMLBoxView {
         // jQuery('#'+this._id).jstree({ "core": { "data": this.model.data, "check_callback": true}, plugins: this.model.plugins});
         jQuery('#'+this._id).on('changed.jstree', (e: any, data: any) => this._update_code_from_editor(e, data));
         jQuery('#'+this._id).on('before_open.jstree', (e: any, data: any) => this._listen_for_node_open(e, data));
+        jQuery('#'+this._id).on('refresh.jstree', ({}, {}) => this._update_selection_from_value());
+        jQuery('#'+this._id).on('create_node.jstree', ({}, {}) => this._update_selection_from_value());
 
     }
     //
@@ -327,18 +330,30 @@ export class jsTreePlotView extends PanelHTMLBoxView {
     _update_code_from_editor({}, data: any): void {
         this.model.value = data.instance.get_selected();
     }
+    _update_selection_from_value(): void {
+        console.log(this.model.value)
+        jQuery('#'+this._id).jstree(true).select_node(this.model.value)
+    }
 
     _update_tree_from_new_nodes(): void {
+        console.log(this.model._new_nodes)
         for (let node of this.model._new_nodes){
             jQuery('#'+this._id).jstree(true).create_node(node["parent"], node, "first")
         }
         jQuery('#'+this._id).jstree(true).settings.core.data = jQuery('#'+this._id).jstree(true).get_json()
         this.model.data = jQuery('#'+this._id).jstree(true).settings.core.data
+        // this._update_selection_from_value()
     }
 
     _update_tree_from_data(): void {
+        console.log("updating data")
         jQuery('#'+this._id).jstree(true).settings.core.data = this.model.data;
+        this.model._flat_tree = jQuery('#'+this._id).jstree(true).get_json(null, {"flat": true})
+        console.log("tfd", this.model._flat_tree)
+        
         jQuery('#'+this._id).jstree(true).refresh(false, true);
+        // this._update_selection_from_value()
+        
     }
 
 
@@ -378,6 +393,7 @@ export namespace jsTreePlot {
         url: p.Property<string>
         _last_opened: p.Property<any>
         _new_nodes: p.Property<any>
+        _flat_tree: p.Property<any>
     }
 }
 
@@ -402,7 +418,8 @@ export class jsTreePlot extends HTMLBox {
         show_dots:     [ Boolean, true ],
         url: [ String, "" ],
         _last_opened: [ Any, {} ],
-        _new_nodes: [ Any, {} ]
+        _new_nodes: [ Any, {} ],
+        _flat_tree: [ Array(Any), []     ],
     }))
     }
 }
@@ -456,7 +473,9 @@ class jsTreePlot(HTMLBox):
     url = String()
     _last_opened = Any()
     _new_nodes = Any()
+    _flat_tree = List(Any)
 
     # Callback properties
     value = List(Any)
     data = List(Any)
+
