@@ -340,7 +340,7 @@ export class jsTreePlotView extends PanelHTMLBoxView {
         for (let node of this.model._new_nodes){
             jQuery('#'+this._id).jstree(true).create_node(node["parent"], node, "first")
         }
-        jQuery('#'+this._id).jstree(true).settings.core.data = jQuery('#'+this._id).jstree(true).get_json()
+        jQuery('#'+this._id).jstree(true).settings.core.data = jQuery('#'+this._id).jstree(true).get_json(null, {no_li_attr: true, no_a_attr: true, no_data: true})
         this.model.data = jQuery('#'+this._id).jstree(true).settings.core.data
         // this._update_selection_from_value()
     }

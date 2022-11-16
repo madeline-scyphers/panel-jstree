@@ -125,36 +125,28 @@ class FileTree(_jsTreeBase):
 
     def _new_nodes_on_value_update(self, event):
         def transverse(d: list, value):
-            paths = list(reversed((value, *Path(value).parents)))
-            for i, path in enumerate(paths):
-                if not (Path(self.directory) in Path(path).parents):
-                    continue
-                for node in d:
-                    if path == Path(node["id"]):
-                        if node.get("children"):
-                            node["state"] = {"opened": True}
-                            transverse(node["children"], value)
-                        else:
-                            node["children"] = self._get_child_json(str(path), add_parent=True, state={"opened": True})
-                            if "opened" not in node.get("state", {}) or node["state"]["opened"] is False:
-                                state = node.get("state", {})
-                                state["opened"] = True
-                                node["state"] = state
-                            if i < len(paths) - 1:
-                                for n in node["children"]:
-                                    if paths[i+1] == Path(n["id"]):
-                                        transverse([n], value)
-                        break
+            parents = Path(value).parents
+            for node in d:
+                if Path(node["id"]) == Path(value):
+                    break
+                if Path(node["id"]) in parents:
+                    node.setdefault("state", {})["opened"] = True
+                    if node.get("children"):
+                        transverse(node["children"], value)
+                    else:
+                        node["children"] = self._get_child_json(node["id"], add_parent=True, state={"opened": True})
+                        [transverse([n], value) for n in node["children"] if Path(n["id"]) in parents]
+                    break
+
         ids = [node["id"] for node in self._flat_tree]
         values = [value for value in self.value if value not in ids]
         if values:
-            data = copy.deepcopy(self.param.values()["data"])
+            data = copy.deepcopy(event.obj.data[:])
+
             for value in values:
                 transverse(data, value)
-            self.param.update(data=data)
-            # self.data = data
-        # /Users/madelinescyphers/Documents/projs_.nosync/panel-jstree/tests/__pycache__/__init__.cpython-39.pyc
-        # /Users/madelinescyphers/Documents/projs_.nosync/panel-jstree/examples/awesome-panel/awesome-panel-cli/widgets/viewer.py
+            self.data = data
+
     def _add_node_children(self, event: param.parameterized.Event = None, dirs = None, **kwargs):
         new_nodes = []
         kw = {}

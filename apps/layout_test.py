@@ -62,7 +62,7 @@ def view():
 
     text_input = pn.widgets.TextInput(name='Text Input', placeholder='Enter a string here...')
     ft = FileTree("..",
-                  # select_multiple=False
+                  select_multiple=False
                   )
     checkboxes2 = pn.widgets.ToggleGroup(options=["a", "b", "c"],)
     # slider = pn.widgets.IntSlider(name='Number of observations', value=500, start=0, end=2000)
@@ -85,7 +85,8 @@ def view():
     def text_box_cb(val):
         ft.value = [val, *ft.value]
 
-
+    import bokeh.core.property.wrappers
+    bokeh.core.property.wrappers.PropertyValueList
 
     # selections = pn.Column(ft, checkboxes, df_pane)
     # selections = pn.Row(
