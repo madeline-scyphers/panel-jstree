@@ -124,8 +124,6 @@ class FileTree(_jsTreeBase):
         self.param.watch(self._new_nodes_on_value_update, "value")
 
     def _new_nodes_on_value_update(self, event):
-        print(self.value)
-
         def transverse(d: list, value):
             paths = list(reversed((value, *Path(value).parents)))
             for i, path in enumerate(paths):
@@ -137,13 +135,7 @@ class FileTree(_jsTreeBase):
                             node["state"] = {"opened": True}
                             transverse(node["children"], value)
                         else:
-                            children = self._get_child_json(str(path), add_parent=True, state={"opened": True})
-                            # children[1]["state"]["selected"] = True
-                            # for l, child in enumerate(children):
-                            #     if Path(value) == Path(child["id"]):
-                            #         children[0]["state"] = {"selected": True}
-
-                            node["children"] = children
+                            node["children"] = self._get_child_json(str(path), add_parent=True, state={"opened": True})
                             if "opened" not in node.get("state", {}) or node["state"]["opened"] is False:
                                 state = node.get("state", {})
                                 state["opened"] = True
@@ -156,10 +148,11 @@ class FileTree(_jsTreeBase):
         ids = [node["id"] for node in self._flat_tree]
         values = [value for value in self.value if value not in ids]
         if values:
-            data = copy.deepcopy(self.data)
+            data = copy.deepcopy(self.param.values()["data"])
             for value in values:
                 transverse(data, value)
-            self.data = copy.deepcopy(data)
+            self.param.update(data=data)
+            # self.data = data
         # /Users/madelinescyphers/Documents/projs_.nosync/panel-jstree/tests/__pycache__/__init__.cpython-39.pyc
         # /Users/madelinescyphers/Documents/projs_.nosync/panel-jstree/examples/awesome-panel/awesome-panel-cli/widgets/viewer.py
     def _add_node_children(self, event: param.parameterized.Event = None, dirs = None, **kwargs):
