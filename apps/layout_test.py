@@ -1,9 +1,10 @@
 import panel as pn
 pn.__version__ = "0.14.0"  # hv needs this and I am using a dev install
-import numpy as np
+# import numpy as np
 from panel_jstree.widgets.jstree import FileTree
-import pandas as pd
-from bokeh.sampledata.autompg import autompg
+import param
+# import pandas as pd
+# from bokeh.sampledata.autompg import autompg
 # css = '''
 # .left-header = {
 #   align-items: center;
@@ -33,6 +34,29 @@ pn.extension()
 # import holoviews as hv
 
 # pn.extension("jstree")
+class A(param.Parameterized):
+    status_text = param.String("this is some label")
+    button = param.ClassSelector(class_=pn.widgets.Widget, default=pn.widgets.Button(button_type="primary", name="some name"))
+
+    def __init__(self, **params):
+        super().__init__(**params)
+        self.filetree = FileTree("..",
+                  select_multiple=False
+                  )
+
+        self.view = pn.Column(
+            pn.pane.Alert(self.status_text),
+            self.button,
+            self.filetree,
+        )
+
+    @param.depends("button.value", watch=True)
+    def foo(self):
+        if self.filetree.value:
+            self.status_text = "A: "
+        else:
+            self.status_text = "B: "
+
 
 
 def view():
@@ -48,7 +72,7 @@ def view():
     # ft = FileTree()
 
     # df = pd.util.testing.makeDataFrame()
-    df_pane = pn.widgets.Tabulator(autompg, groupby=['yr', 'origin'])
+    # df_pane = pn.widgets.Tabulator(autompg, groupby=['yr', 'origin'])
 
     # @pn.depends(checkboxes.param.value, slider.param.value)
     # def tabs(distribution, n):
@@ -83,7 +107,8 @@ def view():
 
     @pn.depends(text_input, watch=True)
     def text_box_cb(val):
-        ft.value = [val, *ft.value]
+        ft.value = [val]
+        # ft.value = [val, *ft.value]
 
     import bokeh.core.property.wrappers
     bokeh.core.property.wrappers.PropertyValueList

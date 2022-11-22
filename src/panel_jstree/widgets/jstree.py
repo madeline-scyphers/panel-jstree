@@ -10,21 +10,15 @@ import os
 from typing import (
     AnyStr, TYPE_CHECKING, ClassVar, Type, Any, Optional
 )
-import sys
 from pathlib import Path
 
 import param
-from panel.models import Location
 
 #from ..models.enums import ace_themes
 from panel.widgets.base import Widget
-from panel.viewable import Layoutable
-from panel.io.state import state
-from panel.io import PeriodicCallback
 from panel.util import fullpath
 from panel.widgets.file_selector import _scan_path
 from ..bokeh_extensions.jstree import jsTreePlot
-from panel.io.server import serve
 if TYPE_CHECKING:
     from bokeh.model import Model
 
@@ -183,7 +177,10 @@ class FileTree(_jsTreeBase):
 
     @staticmethod
     def _get_paths(directory, children_to_skip=()):
-        dirs, files = _scan_path(directory, file_pattern='[!.]*')
+        try:
+            dirs, files = _scan_path(directory, file_pattern='[!.]*')
+        except OSError:
+            dirs, files = [], []
         dirs = [d for d in dirs if not Path(d).name.startswith(".") and d not in children_to_skip]
         files = [f for f in files if f not in children_to_skip]
         return dirs, files

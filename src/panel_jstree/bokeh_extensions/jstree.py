@@ -466,6 +466,8 @@ class jsTreePlot(HTMLBox):
     __javascript__ = ['https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js',
         'https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js']
 
+
+
     plugins = List(Any)
     multiple = Bool(default=True)
     show_icons = Bool(default=True)
