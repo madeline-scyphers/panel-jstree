@@ -10,6 +10,7 @@ import os
 from typing import (
     AnyStr, TYPE_CHECKING, ClassVar, Type, Any, Optional
 )
+import logging
 from pathlib import Path
 
 import param
@@ -22,6 +23,7 @@ from ..bokeh_extensions.jstree import jsTreePlot
 if TYPE_CHECKING:
     from bokeh.model import Model
 
+logger = logging.getLogger(__file__)
 
 
 class _jsTreeBase(Widget):
@@ -179,9 +181,19 @@ class FileTree(_jsTreeBase):
     def _get_paths(directory, children_to_skip=()):
         try:
             dirs, files = _scan_path(directory, file_pattern='[!.]*')
-        except OSError:
+        except OSError as e:
+            print(repr(e))
             dirs, files = [], []
-        dirs = [d for d in dirs if not Path(d).name.startswith(".") and d not in children_to_skip]
+        dirs = []
+        for d in dirs:
+            if not Path(d).name.startswith(".") and d not in children_to_skip:
+                try:
+                    os.listdir(d)
+                    dirs.append(d)
+                except OSError as e:
+                    logger.error(e)
+
+        # dirs = [d for d in dirs if not Path(d).name.startswith(".") and d not in children_to_skip]
         files = [f for f in files if f not in children_to_skip]
         return dirs, files
 
