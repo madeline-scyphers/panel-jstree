@@ -7,6 +7,6 @@
   "repository": {},
   "dependencies": {
     "@bokeh/bokehjs": "^2.4.3",
-    "@holoviz/panel": "^0.14.0"
+    "@holoviz/panel": "^0.14.4"
   }
 }
