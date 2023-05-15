@@ -33,10 +33,7 @@ classifiers = [
     "Topic :: Scientific/Engineering",
     "Topic :: Software Development :: Libraries",
 ]
-dependencies = [
-    "bokeh<3.0",
-    "panel<1.0",
-]
+dependencies = []
 dynamic = ["version"]
 
 authors = [

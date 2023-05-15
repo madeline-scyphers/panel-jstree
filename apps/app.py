@@ -3,7 +3,9 @@
 This project was created with the [awesome-panel-cli](https://github.com/awesome-panel/awesome-panel-cli)
 """
 import panel as pn
-from panel_jstree.widgets.jstree import FileTree
+from panel_jstree.widgets import FileTree
+
+pn.extension("tree")
 
 
 def file_tree():

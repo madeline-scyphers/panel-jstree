@@ -1,13 +1,14 @@
-name: panel-jstree
+name: panel-jstree-test
 channels:
   - pyviz
+  - pyviz/label/dev
   - conda-forge
   - defaults
 dependencies:
-  - python=3.9
-  - bokeh<3
-  - pyviz::panel<1.0
-  - pyviz::param<2.0
+  - python=3.10
+  - panel<1
   - conda-forge::nodejs>=14
   - conda-forge::jupyterlab
   - pip
+  - pip:
+      - -e .

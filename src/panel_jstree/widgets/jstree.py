@@ -179,19 +179,15 @@ class FileTree(_jsTreeBase):
 
     @staticmethod
     def _get_paths(directory, children_to_skip=()):
-        try:
-            dirs, files = _scan_path(directory, file_pattern='[!.]*')
-        except OSError as e:
-            print(repr(e))
-            dirs, files = [], []
+        dirs_, files = _scan_path(directory, file_pattern='[!.]*')
         dirs = []
-        for d in dirs:
+        for d in dirs_:
             if not Path(d).name.startswith(".") and d not in children_to_skip:
                 try:
-                    os.listdir(d)
-                    dirs.append(d)
+                    if os.listdir(d):
+                        dirs.append(d)
                 except OSError as e:
-                    logger.error(e)
+                    print(repr(e), d)
 
         # dirs = [d for d in dirs if not Path(d).name.startswith(".") and d not in children_to_skip]
         files = [f for f in files if f not in children_to_skip]
