@@ -1,6 +1,47 @@
+// @ts-nocheck
+import {div} from "@bokehjs/core/dom"
 import {isArray} from "@bokehjs/core/util/types"
+import {WidgetView} from "@bokehjs/models/widgets/widget"
+import {Markup} from "@bokehjs/models/widgets/markup"
 import {LayoutDOM, LayoutDOMView} from "@bokehjs/models/layouts/layout_dom"
 import * as p from "@bokehjs/core/properties"
+
+export class PanelMarkupView extends WidgetView {
+  container: HTMLDivElement
+  model: Markup
+
+  override async lazy_initialize() {
+    await super.lazy_initialize()
+
+    if (this.provider.status == "not_started" || this.provider.status == "loading")
+      this.provider.ready.connect(() => {
+        if (this.contains_tex_string(this.model.text))
+          this.render()
+      })
+  }
+
+  override connect_signals(): void {
+    super.connect_signals()
+    this.connect(this.model.change, () => {
+      this.render()
+    })
+  }
+
+  has_math_disabled() {
+    return this.model.disable_math || !this.contains_tex_string(this.model.text)
+  }
+
+  override render(): void {
+    super.render()
+    set_size(this.el, this.model)
+    this.container = div()
+    set_size(this.container, this.model, false)
+    this.shadow_el.appendChild(this.container)
+
+    if (this.provider.status == "failed" || this.provider.status == "loaded")
+      this._has_finished = true
+  }
+}
 
 export function set_size(el: HTMLElement, model: HTMLBox, adjustMargin: boolean = true): void {
   let width_policy = model.width != null ? "fixed" : "fit"

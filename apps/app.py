@@ -11,7 +11,7 @@ pn.extension("tree")
 def file_tree():
     ft = FileTree(
         directory="~/Documents",
-        checkbox=True
+        # checkbox=True
     )
     return pn.Column(ft)
 

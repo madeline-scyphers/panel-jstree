@@ -1,4 +1,4 @@
-name: panel-jstree-test
+name: panel-jstree
 channels:
   - pyviz
   - pyviz/label/dev
@@ -6,7 +6,7 @@ channels:
   - defaults
 dependencies:
   - python=3.10
-  - panel<1
+  - panel==1.0.0rc9
   - conda-forge::nodejs>=14
   - conda-forge::jupyterlab
   - pip
