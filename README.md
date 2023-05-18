@@ -5,11 +5,18 @@ We want to
 
 You can install and use the package as simple as.
 
-clone the repo and run
+clone the repo and run:
 
 ```bash
 conda env create
 ```
+
+and run:
+
+```bash
+panel build src/panel_jstree
+```
+
 
 Example
 
