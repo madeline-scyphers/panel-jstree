@@ -74,6 +74,7 @@ class _jsTreeBase(Widget):
         property names.
         """
         properties = super()._process_param_change(msg)
+        properties.pop("title", None)
         if not properties.get("height") and (self.sizing_mode is None or "width" in self.sizing_mode):
             properties["height"] = 400
         if properties.get("height") and properties["height"] < 100:
@@ -106,7 +107,6 @@ class FileTree(_jsTreeBase):
         """
         msg = super()._process_param_change(msg)
         msg.pop("directory", None)
-        msg.pop("title", None)
         return msg
 
     def __init__(self, directory: AnyStr | os.PathLike | None = None, **params):

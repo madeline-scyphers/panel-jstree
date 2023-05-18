@@ -1,7 +1,12 @@
 import * as p from "@bokehjs/core/properties"
-// import { HTMLBox, HTMLBoxView } from "models/layouts/html_box"  // duplicated below for now
 import { div } from "@bokehjs/core/dom"
+
+//panel > 1
 import {HTMLBox, HTMLBoxView, set_size} from "./layout"
+
+// panel < 1
+// import { HTMLBox, HTMLBoxView } from "@bokehjs/models/layouts/html_box"  // duplicated below for now
+// import {set_size} from "./layout"
 
 
 declare function jQuery(...args: any[]): any

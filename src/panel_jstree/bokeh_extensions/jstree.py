@@ -3,14 +3,19 @@ Defines custom jsTree bokeh model to render Ace editor.
 """
 from __future__ import absolute_import, division, unicode_literals
 
-from bokeh.core.properties import String, Any, List, Bool
-from panel.models.layout import HTMLBox
+from bokeh.core.properties import String, Override, Dict, Any, List, Bool, Enum, JSON
+
+from bokeh.models.layouts import LayoutDOM
 
 
 from panel import extension
 # pylint: disable=protected-access
 extension._imports["tree"] = "panel_jstree.bokeh_extensions.jstree"
 # pylint: enable=protected-access
+
+
+class HTMLBox(LayoutDOM):
+    """ """
 
 
 class jsTreePlot(HTMLBox):
