@@ -1,5 +1,4 @@
 import * as p from "@bokehjs/core/properties"
-// import { HTMLBox, HTMLBoxView } from "models/layouts/html_box"  // duplicated below for now
 import { div } from "@bokehjs/core/dom"
 import {HTMLBox, HTMLBoxView} from "./layout"
 
@@ -56,7 +55,7 @@ export class jsTreePlotView extends HTMLBoxView {
         // applyStyle(this.el, JSTREE_DIV_STYLES)
         // set_size(this.el, this.model)
         //if (!(this._container === this.el.childNodes[0]))
-        this.el.appendChild(this._container);
+        this.shadow_el.appendChild(this._container);
 
         let kw = {}
         if (!this.model.multiple) {
@@ -65,7 +64,7 @@ export class jsTreePlotView extends HTMLBoxView {
                         "cascade": "undetermined"}}
         }
 
-        this._jstree = jQuery('#'+this._id).jstree(
+        this._jstree = jQuery(this._container).jstree(
             { "core":
                 {"data": this.model.data, "check_callback": true,
                  "multiple": this.model.multiple,
@@ -162,19 +161,19 @@ export class jsTreePlotView extends HTMLBoxView {
 }
 
 export namespace jsTreePlot {
-    export type Attrs = p.AttrsOf<Props>
-    export type Props = HTMLBox.Props & {
-        data: p.Property<any>
-        plugins: p.Property<any>
-        multiple: p.Property<boolean>
-        show_icons: p.Property<boolean>
-        show_dots: p.Property<boolean>
-        value: p.Property<any>
-        url: p.Property<string>
-        _last_opened: p.Property<any>
-        _new_nodes: p.Property<any>
-        _flat_tree: p.Property<any>
-    }
+  export type Attrs = p.AttrsOf<Props>
+  export type Props = HTMLBox.Props & {
+    data: p.Property<any>
+    plugins: p.Property<any>
+    multiple: p.Property<boolean>
+    show_icons: p.Property<boolean>
+    show_dots: p.Property<boolean>
+    value: p.Property<any>
+    url: p.Property<string>
+    _last_opened: p.Property<any>
+    _new_nodes: p.Property<any>
+    _flat_tree: p.Property<any>
+  }
 }
 
 export interface jsTreePlot extends jsTreePlot.Attrs {}
@@ -188,10 +187,10 @@ export class jsTreePlot extends HTMLBox {
 
     static __module__ = "panel_jstree.bokeh_extensions.jstree"
 
-    static init_jsTreePlot(): void {
-        this.prototype.default_view = jsTreePlotView
+    static {
+      this.prototype.default_view = jsTreePlotView
 
-    this.define<jsTreePlot.Props>(({Array, Any, Boolean, String}) => ({
+      this.define<jsTreePlot.Props>(({Array, Any, Boolean, String}) => ({
         value:          [ Array(Any), []     ],
         data:          [ Array(Any), []     ],
         plugins:       [ Array(Any), []     ],
@@ -202,6 +201,6 @@ export class jsTreePlot extends HTMLBox {
         _last_opened: [ Any, {} ],
         _new_nodes: [ Any, {} ],
         _flat_tree: [ Array(Any), []     ],
-    }))
+      }))
     }
 }

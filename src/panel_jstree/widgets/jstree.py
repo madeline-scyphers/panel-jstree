@@ -2,24 +2,24 @@
 Defines various Select widgets which allow choosing one or more items
 from a list of options.
 """
-from __future__ import absolute_import, division, unicode_literals, annotations
+from __future__ import annotations
 
 import copy
+import logging
 import os
 
+from pathlib import Path
 from typing import (
     AnyStr, TYPE_CHECKING, ClassVar, Type, Any, Optional
 )
-import logging
-from pathlib import Path
 
 import param
 
-#from ..models.enums import ace_themes
 from panel.widgets.base import Widget
 from panel.util import fullpath
 from panel.widgets.file_selector import _scan_path
 from ..bokeh_extensions.jstree import jsTreePlot
+
 if TYPE_CHECKING:
     from bokeh.model import Model
 
