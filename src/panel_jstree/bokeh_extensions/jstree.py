@@ -15,6 +15,7 @@ import pathlib
 
 from panel import extension
 # pylint: disable=protected-access
+
 extension._imports["tree"] = "panel_jstree.bokeh_extensions.jstree"
 # pylint: enable=protected-access
 
@@ -53,4 +54,3 @@ class jsTreePlot(HTMLBox):
 
     checkbox = Bool()
     directory = String()
-

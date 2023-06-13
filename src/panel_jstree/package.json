@@ -6,7 +6,11 @@
   "keywords": [],
   "repository": {},
   "dependencies": {
-    "@bokeh/bokehjs": "^3",
-    "@holoviz/panel": "1.0.0-rc.9"
-  }
+    "@bokeh/bokehjs": "^3.1",
+    "@holoviz/panel": "1.0.4"
+  },
+  "files": [
+    "dist/**/*.{js,js.map,d.ts,json,css,whl}"
+  ],
+  "main": "dist/panel_jstree.min.js"
 }
