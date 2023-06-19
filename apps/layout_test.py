@@ -86,28 +86,36 @@ def view():
 
     text_input = pn.widgets.TextInput(name='Text Input', placeholder='Enter a string here...')
     ft = FileTree("..",
-                  select_multiple=False
+                  select_multiple=True,
+                  # checkbox=False,
                   )
     checkboxes2 = pn.widgets.ToggleGroup(options=["a", "b", "c"],)
     # slider = pn.widgets.IntSlider(name='Number of observations', value=500, start=0, end=2000)
 
     cb1 = pn.widgets.Checkbox(name='Show icons', value=True)
     cb2 = pn.widgets.Checkbox(name='select multiple', value=False)
+    cb3 = pn.widgets.Checkbox(name='show dots', value=True)
 
 
     @pn.depends(cb1, watch=True)
     def uu2(val):
-        print(val)
         ft.show_icons = val
+        print(ft.show_icons)
 
     @pn.depends(cb2, watch=True)
     def uu1(val):
-        print(val)
         ft.select_multiple = val
+        print(ft.select_multiple)
+
+    @pn.depends(cb3, watch=True)
+    def uu1(val):
+        ft.show_dots = val
+        print(ft.show_dots)
 
     @pn.depends(text_input, watch=True)
     def text_box_cb(val):
         ft.value = [val]
+        print(f"{ft.value=}")
         # ft.value = [val, *ft.value]
 
     import bokeh.core.property.wrappers
@@ -123,7 +131,8 @@ def view():
         # ft,
         checkboxes2,
         cb1,
-        cb2
+        cb2,
+        cb3
     )
     # pn.Row(selections)
     return selections

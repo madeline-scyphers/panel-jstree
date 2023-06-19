@@ -7,7 +7,7 @@
   "repository": {},
   "dependencies": {
     "@bokeh/bokehjs": "^3.1",
-    "@holoviz/panel": "1.0.4"
+    "@holoviz/panel": "^1"
   },
   "files": [
     "dist/**/*.{js,js.map,d.ts,json,css,whl}"

@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__file__)
 
 
-class _jsTreeBase(Widget):
+class _TreeBase(Widget):
     """
     jsTree widget allow editing a tree in an jsTree editor.
     """
@@ -46,9 +46,9 @@ class _jsTreeBase(Widget):
 
     checkbox = param.Boolean(default=True, doc="Whether to to use checkboxes as selectables")
 
-    plugins = param.List(doc="Selected callback data")
-
-    url = param.String(doc="ajax url")  # TODO figure out how to just get the url
+    plugins = param.List(doc="Configure which additional plugins will be active. "
+                             "Should be an array of strings, where each element is a plugin name that are passed"
+                             "to jsTree.")
 
     _last_opened = param.Dict(doc="last opened node")
 
@@ -64,6 +64,9 @@ class _jsTreeBase(Widget):
     def flat_tree(self):
         return self._flat_tree
 
+    @property
+    def _values(self):
+        return [os.path.normpath(p) for p in self.value]
 
     def _process_param_change(self, msg: dict[str, Any]) -> dict[str, Any]:
         """
@@ -74,24 +77,21 @@ class _jsTreeBase(Widget):
         property names.
         """
         properties = super()._process_param_change(msg)
+
+        properties.pop("title", None)
         if not properties.get("height") and (self.sizing_mode is None or "width" in self.sizing_mode):
             properties["height"] = 400
         if properties.get("height") and properties["height"] < 100:
             properties["height"] = 100
 
-        checkbox = properties.pop("checkbox", None)
-        if checkbox:
+        if properties.pop("checkbox", None):
             properties.get("plugins", []).append("checkbox")
+
+        properties["value"] = self._values
         return properties
 
 
-class jsTree(_jsTreeBase):
-    """
-    jsTree widget allow editing a tree in an jsTree editor.
-    """
-
-
-class FileTree(_jsTreeBase):
+class FileTree(_TreeBase):
     """"""
     directory = param.String(default=str(Path.cwd()), doc="""
         The directory to explore.""")
@@ -106,7 +106,6 @@ class FileTree(_jsTreeBase):
         """
         msg = super()._process_param_change(msg)
         msg.pop("directory", None)
-        msg.pop("title", None)
         return msg
 
     def __init__(self, directory: AnyStr | os.PathLike | None = None, **params):
@@ -135,7 +134,7 @@ class FileTree(_jsTreeBase):
                     break
 
         ids = [node["id"] for node in self._flat_tree]
-        values = [value for value in self.value if value not in ids]
+        values = [value for value in self._values if value not in ids]
         if values:
             data = copy.deepcopy(event.obj.data[:])
 

@@ -43,7 +43,6 @@ class jsTreePlot(HTMLBox):
     multiple = Bool(default=True)
     show_icons = Bool(default=True)
     show_dots = Bool(default=True)
-    url = String()
     _last_opened = Any()
     _new_nodes = Any()
     _flat_tree = List(Any)
