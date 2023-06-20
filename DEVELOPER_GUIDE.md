@@ -39,10 +39,14 @@ pytest tests
 ```
 
 Update the version in [__init__.py](src/panel_jstree/__init__.py).
-And update the version in [package.json](src/panel_jstree/package.json).
+And update the version in [package.json](src/panel_jstree/package.json) (example listed v1.0.0).
 
+**and commit your changes**
 
-
+```bash
+git add src/panel_jstree/__init__.py src/panel_jstree/package.json
+git commit -m "Version 1.0.0"
+```
 
 Then tag a new version (example listed v1.0.0)
 
