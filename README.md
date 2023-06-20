@@ -1,12 +1,6 @@
 # ✨ panel-jstree
 
-We want to
-
-- INSERT THE WHY
-
-We provide
-
-- INSERT THE WHAT
+panel-jstree is a wrapper python wrapper around the javascript library [jstree](https://www.jstree.com) for use in [panel](https://panel.holoviz.org/). This allows for JSON-like representations of tree data. One very useful implementation provided is a server-side file browser.
 
 You can install and use the package as simple as.
 
@@ -21,7 +15,7 @@ from panel_jstree import FileTree
 pn.Column(FileTree())
 ```
 
-![Project Intro](assets/videos/project-intro.gif)
+![Project Intro](https://github.com/madeline-scyphers/panel-jstree/blob/c0c182e09f028fe0fdb963d82ab2cdaad5128a1b/assets/videos/project-intro.gif)
 
 ## 🚀 Get started in under a minute
 

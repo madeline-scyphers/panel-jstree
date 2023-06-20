@@ -52,6 +52,9 @@ examples = [
 [project.urls]
 repository = "https://github.com/madeline-scyphers/panel-jstree"
 
+[tool.setuptools]
+package-dir = {"" = "src"}
+
 [tool.setuptools.dynamic]
 version = {attr = "panel_jstree.VERSION"}
 
