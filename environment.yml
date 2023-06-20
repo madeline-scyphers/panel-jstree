@@ -6,9 +6,10 @@ channels:
   - defaults
 dependencies:
   - python=3.10
-  - panel==1.0.0rc9
+  - panel>=1
   - conda-forge::nodejs>=14
-  - conda-forge::jupyterlab
+  - black
+  - isort
   - pip
   - pip:
       - -e .

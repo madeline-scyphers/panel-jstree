@@ -1,3 +1,10 @@
 include README.md
 include LICENSE
 include src/panel_jstree/py.typed
+graft src/panel_jstree/dist
+include src/panel_jstree/*.json
+include src/panel_jstree/bokeh_extensions/*.ts
+include src/panel_jstree/index.ts
+global-exclude *.ipynb_checkpoints/*
+global-exclude *.py[co]
+global-exclude *~

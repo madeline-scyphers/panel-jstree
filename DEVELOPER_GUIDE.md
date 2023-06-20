@@ -8,7 +8,8 @@ By participating in this project you agree to abide by its terms.
 ## 🧳 Prerequisites
 
 - A working [Python](https://www.python.org/downloads/) environment.
-- [Git CLI](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
+- git
+- preferbly conda
 
 ## 📙 How to
 
@@ -23,44 +24,31 @@ Then run
 ```bash
 git clone https://github.com/madeline-scyphers/panel-jstree.git
 cd panel-jstree
-pip install pip -U
-pip install -e .[dev,examples]
+conda create
+conda activate panel-jstree
 ```
 
-Then you can see the available commands via
-
-```bash
-pn --help
-```
-
-You can run all tests via
-
-```bash
-pn test all
-```
 
 Please run this command and fix any failing tests if possible before you `git push`.
 
 ### 🚢 Release a new package on Pypi
 
-Update the version in the [__init__.py](src/panel_jstree/__init__.py).
-
-Then run
-
+Run all tests
 ```bash
-pn test all
+pytest tests
 ```
 
-Then you can build
+Update the version in [__init__.py](src/panel_jstree/__init__.py).
+And update the version in [package.json](src/panel_jstree/package.json).
+
+
+
+
+Then tag a new version (example listed v1.0.0)
 
 ```bash
-pn build package
+git tag -a v1.0.0 -m "Some message"
+git push origin v1.0.0
 ```
 
-and upload
-
-```bash
-pn release package <VERSION>
-```
-
-to release the package 📦. To upload to *Test Pypi* first, you can add the `--test` flag.
+This will release a new version to PyPI when pushed. 

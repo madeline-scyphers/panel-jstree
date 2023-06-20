@@ -15,38 +15,19 @@ pip install panel-jstree
 ```
 
 ```python
-import panel_jstree
-INSERT A SHORT EXAMPLE
+import panel as pn
+from panel_jstree import FileTree
+
+pn.Column(FileTree())
 ```
 
 ![Project Intro](assets/videos/project-intro.gif)
 
-REPLACE THE INTRO VIDEO
-
 ## 🚀 Get started in under a minute
 
-Install `panel-jstree` including the *`examples` dependencies*.
-
 ```bash
-pip install  panel-jstree[examples]
+pip install  panel-jstree
 ```
-
-Explore the sample apps
-
-```bash
-pn hello panel-jstree
-```
-
-![Project Intro](https://raw.githubusercontent.com/madeline-scyphers/panel-jstree/main/assets/videos/pn-hello-panel-jstree.gif)
-
-You can now find the *reference* and *gallery* notebooks in the `examples/madeline-scyphers/panel-jstree` folder. Check them out by running `jupyter lab`.
-
-## 📒 Explore the examples online
-
-Click one of the buttons
-
-[![nbviewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.org/github/madeline-scyphers/panel-jstree/tree/main/examples/)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/madeline-scyphers/panel-jstree/HEAD)
 
 ## ⭐ Support
 
@@ -69,7 +50,6 @@ I would love to support and receive your contributions. Thanks.
 ## Monitor
 
 [![PyPI version](https://badge.fury.io/py/panel-jstree.svg)](https://pypi.org/project/panel-jstree/)
-[![Downloads](https://pepy.tech/badge/panel-jstree/month)](https://pepy.tech/project/panel-jstree)
-![Python Versions](https://img.shields.io/badge/python-3.7%20%7C%203.8%20%7C%203.9%20%7C%203.10-blue)
+![Python Versions](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10-blue)
 [![License](https://img.shields.io/badge/License-MIT%202.0-blue.svg)](https://opensource.org/licenses/MIT)
-![Test Results](https://github.com/madeline-scyphers/panel-jstree/actions/workflows/tests.yaml/badge.svg?branch=main)
+

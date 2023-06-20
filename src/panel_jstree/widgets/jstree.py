@@ -39,8 +39,7 @@ class _TreeBase(Widget):
 
     select_multiple = param.Boolean(default=True, doc="Whether multiple nodes can be selected or not")
 
-    show_icons = param.Boolean(default=True, doc="""
-        Whether to use icons or not""")
+    show_icons = param.Boolean(default=True, doc="Whether to use icons or not")
 
     show_dots = param.Boolean(default=True, doc="Whether to show dots on the left as part of the tree")
 
