@@ -3,17 +3,17 @@ Defines custom jsTree bokeh model to render Ace editor.
 """
 from __future__ import absolute_import, division, unicode_literals
 
-from bokeh.core.properties import String, Override, Dict, Any, List, Bool, Enum, JSON
-# from .layout import HTMLBox
-from bokeh.util.compiler import TypeScript
-from bokeh.models.layouts import LayoutDOM
-
-from panel.io.resources import bundled_files, JS_URLS
-from panel.util import classproperty
-
 import pathlib
 
+from bokeh.core.properties import JSON, Any, Bool, Dict, Enum, List, Override, String
+from bokeh.models.layouts import LayoutDOM
+
+# from .layout import HTMLBox
+from bokeh.util.compiler import TypeScript
 from panel import extension
+from panel.io.resources import JS_URLS, bundled_files
+from panel.util import classproperty
+
 # pylint: disable=protected-access
 
 extension._imports["tree"] = "panel_jstree.bokeh_extensions.jstree"
@@ -30,13 +30,11 @@ class jsTreePlot(HTMLBox):
     a Bokeh plot.
     """
 
-    __css__ = [
-        'https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css'
-    ]
+    __css__ = ["https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css"]
 
     __javascript__ = [
-        'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js',
-        'https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js'
+        "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js",
     ]
 
     plugins = List(Any)

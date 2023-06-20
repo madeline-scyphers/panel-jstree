@@ -1,21 +1,24 @@
 import panel as pn
+
 from panel_jstree.widgets.jstree import FileTree
 
 pn.extension("tree")
 
 
 def view():
-    text_input = pn.widgets.TextInput(name='Text Input', placeholder='Enter a string here...')
-    ft = FileTree("..",
-                  select_multiple=True,
-                  # checkbox=False,
-                  )
-    checkboxes2 = pn.widgets.ToggleGroup(options=["a", "b", "c"],)
+    text_input = pn.widgets.TextInput(name="Text Input", placeholder="Enter a string here...")
+    ft = FileTree(
+        "..",
+        select_multiple=True,
+        # checkbox=False,
+    )
+    checkboxes2 = pn.widgets.ToggleGroup(
+        options=["a", "b", "c"],
+    )
 
-    cb1 = pn.widgets.Checkbox(name='Show icons', value=True)
-    cb2 = pn.widgets.Checkbox(name='select multiple', value=False)
-    cb3 = pn.widgets.Checkbox(name='show dots', value=True)
-
+    cb1 = pn.widgets.Checkbox(name="Show icons", value=True)
+    cb2 = pn.widgets.Checkbox(name="select multiple", value=False)
+    cb3 = pn.widgets.Checkbox(name="show dots", value=True)
 
     @pn.depends(cb1, watch=True)
     def uu2(val):
@@ -33,17 +36,16 @@ def view():
     def text_box_cb(val):
         ft.value = [val]
 
-
     return pn.Column(
         # df_pane,
         # checkboxes,
         text_input,
-        pn.Card(ft, title='File Picker'),
+        pn.Card(ft, title="File Picker"),
         # ft,
         checkboxes2,
         cb1,
         cb2,
-        cb3
+        cb3,
     )
 
 

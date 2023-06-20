@@ -7,17 +7,14 @@ from __future__ import annotations
 import copy
 import logging
 import os
-
 from pathlib import Path
-from typing import (
-    AnyStr, TYPE_CHECKING, ClassVar, Type, Any, Optional
-)
+from typing import TYPE_CHECKING, Any, AnyStr, ClassVar, Optional, Type
 
 import param
-
-from panel.widgets.base import Widget
 from panel.util import fullpath
+from panel.widgets.base import Widget
 from panel.widgets.file_selector import _scan_path
+
 from ..bokeh_extensions.jstree import jsTreePlot
 
 if TYPE_CHECKING:
@@ -33,21 +30,30 @@ class _TreeBase(Widget):
 
     value = param.List(default=[], doc="List of currently selected leaves and nodes")
 
-    data = param.List(default=[], doc="Hierarchical tree structure of data. See "
-                                      " `jsTree <https://www.jstree.com>`_ for more"
-                                      " details on formatting")
+    data = param.List(
+        default=[],
+        doc="Hierarchical tree structure of data. See "
+        " `jsTree <https://www.jstree.com>`_ for more"
+        " details on formatting",
+    )
 
-    select_multiple = param.Boolean(default=True, doc="Whether multiple nodes can be selected or not")
+    select_multiple = param.Boolean(
+        default=True, doc="Whether multiple nodes can be selected or not"
+    )
 
     show_icons = param.Boolean(default=True, doc="Whether to use icons or not")
 
-    show_dots = param.Boolean(default=True, doc="Whether to show dots on the left as part of the tree")
+    show_dots = param.Boolean(
+        default=True, doc="Whether to show dots on the left as part of the tree"
+    )
 
     checkbox = param.Boolean(default=True, doc="Whether to to use checkboxes as selectables")
 
-    plugins = param.List(doc="Configure which additional plugins will be active. "
-                             "Should be an array of strings, where each element is a plugin name that are passed"
-                             "to jsTree.")
+    plugins = param.List(
+        doc="Configure which additional plugins will be active. "
+        "Should be an array of strings, where each element is a plugin name that are passed"
+        "to jsTree."
+    )
 
     _last_opened = param.Dict(doc="last opened node")
 
@@ -78,7 +84,9 @@ class _TreeBase(Widget):
         properties = super()._process_param_change(msg)
 
         properties.pop("title", None)
-        if not properties.get("height") and (self.sizing_mode is None or "width" in self.sizing_mode):
+        if not properties.get("height") and (
+            self.sizing_mode is None or "width" in self.sizing_mode
+        ):
             properties["height"] = 400
         if properties.get("height") and properties["height"] < 100:
             properties["height"] = 100
@@ -92,8 +100,12 @@ class _TreeBase(Widget):
 
 class FileTree(_TreeBase):
     """"""
-    directory = param.String(default=str(Path.cwd()), doc="""
-        The directory to explore.""")
+
+    directory = param.String(
+        default=str(Path.cwd()),
+        doc="""
+        The directory to explore.""",
+    )
 
     def _process_param_change(self, msg: dict[str, Any]) -> dict[str, Any]:
         """
@@ -109,7 +121,7 @@ class FileTree(_TreeBase):
 
     def __init__(self, directory: AnyStr | os.PathLike | None = None, **params):
         if directory is not None:
-            params['directory'] = fullpath(directory)
+            params["directory"] = fullpath(directory)
         self._file_icon = "jstree-file"
         self._folder_icon = "jstree-folder"
         super().__init__(**params)
@@ -128,8 +140,14 @@ class FileTree(_TreeBase):
                     if node.get("children"):
                         transverse(node["children"], value)
                     else:
-                        node["children"] = self._get_child_json(node["id"], add_parent=True, state={"opened": True}, depth=2)
-                        [transverse([n], value) for n in node["children"] if Path(n["id"]) in parents]
+                        node["children"] = self._get_child_json(
+                            node["id"], add_parent=True, state={"opened": True}, depth=2
+                        )
+                        [
+                            transverse([n], value)
+                            for n in node["children"]
+                            if Path(n["id"]) in parents
+                        ]
                     break
 
         ids = [node["id"] for node in self._flat_tree]
@@ -141,14 +159,17 @@ class FileTree(_TreeBase):
                 transverse(data, value)
             self.data = data
 
-    def _add_node_children(self, event: param.parameterized.Event = None, dirs = None, **kwargs):
+    def _add_node_children(self, event: param.parameterized.Event = None, dirs=None, **kwargs):
         new_nodes = []
         kw = {}
         if not dirs:
             if event:
                 nodes_already_sent = event.new.get("children_d", [])
                 dirs = event.new["children"]
-                kw = dict(add_parent=True, children_to_skip=nodes_already_sent, )
+                kw = dict(
+                    add_parent=True,
+                    children_to_skip=nodes_already_sent,
+                )
             else:
                 dirs = [self.directory]
                 kw = dict(depth=1)
@@ -158,8 +179,9 @@ class FileTree(_TreeBase):
                 new_nodes.extend(children)
         self._new_nodes = new_nodes
 
-
-    def _get_child_json(self, directory: str, add_parent=False, depth=0, children_to_skip=(), **kwargs):
+    def _get_child_json(
+        self, directory: str, add_parent=False, depth=0, children_to_skip=(), **kwargs
+    ):
         directory = str(directory)
         parent = directory if add_parent else None
         jsn = []
@@ -171,13 +193,19 @@ class FileTree(_TreeBase):
                 children = self._get_child_json(dir, add_parent=add_parent, depth=depth - 1)
             else:
                 children = None
-            jsn.append(self._get_json(dir, parent=parent, children=children, icon=self._folder_icon, **kwargs))
-        jsn.extend(self._get_json(file, parent=parent, icon=self._file_icon, **kwargs) for file in files)
+            jsn.append(
+                self._get_json(
+                    dir, parent=parent, children=children, icon=self._folder_icon, **kwargs
+                )
+            )
+        jsn.extend(
+            self._get_json(file, parent=parent, icon=self._file_icon, **kwargs) for file in files
+        )
         return jsn
 
     @staticmethod
     def _get_paths(directory, children_to_skip=()):
-        dirs_, files = _scan_path(directory, file_pattern='[!.]*')
+        dirs_, files = _scan_path(directory, file_pattern="[!.]*")
         dirs = []
         for d in dirs_:
             if not Path(d).name.startswith(".") and d not in children_to_skip:
@@ -191,7 +219,9 @@ class FileTree(_TreeBase):
         files = [f for f in files if f not in children_to_skip]
         return dirs, files
 
-    def _get_json(self, txt, parent: str = None, children: Optional[list] = None, icon: str = None, **kwargs):
+    def _get_json(
+        self, txt, parent: str = None, children: Optional[list] = None, icon: str = None, **kwargs
+    ):
         jsn = dict(id=txt, text=Path(txt).name, **kwargs)
         if parent:
             jsn["parent"] = parent
