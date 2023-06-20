@@ -3,7 +3,7 @@ requires = ["setuptools",]
 build-backend = "setuptools.build_meta"
 [project]
 name = "panel-jstree"
-description = "This package makes it super simple to do exploratory data analysis and develop high-quality Panel data apps ..."
+description = "panel-jstree is a wrapper python wrapper around the javascript library jstree for use in panel. This allows for JSON-like representations of tree data. One very useful implementation provided is a server-side file browser."
 readme = "README.md"
 requires-python = ">=3.8"
 keywords = ["python", "holoviz", "panel", "dataviz", "dataapp", "dashboard", "datascience", "analytics"]
