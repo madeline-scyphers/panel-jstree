@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import panel as pn
 
 from panel_jstree.widgets.jstree import FileTree
@@ -49,5 +51,8 @@ def view():
     )
 
 
+if __name__.startswith("bokeh"):
+    view().servable()
+
 if __name__ == "__main__":
-    pn.serve({"file_tree_lo": view}, port=5007, show=False)
+    pn.serve({Path(__file__).name: view}, port=5007, show=False)
