@@ -31,11 +31,11 @@ panel serve examples/*.py --show
 
 Here are some of the examples. You can see a small FileTree app with a text field and controls to directly input a file path, and turn off and on some of the controls.
 
-![FileTree App Example](assets/videos/file-tree.gif)
+![FileTree App Example](https://github.com/madeline-scyphers/panel-jstree/blob/777b299badf308746ff2ea0843755a12fe6158b4/assets/videos/file-tree.gif)
 
 You can also see a generic Tree app with a custom callback to generate random nodes.
 
-![Randomw Tree App Example](assets/videos/random-tree.gif)
+![Randomw Tree App Example](https://github.com/madeline-scyphers/panel-jstree/blob/777b299badf308746ff2ea0843755a12fe6158b4/assets/videos/random-tree.gif)
 
 
 ## ⭐ Support
