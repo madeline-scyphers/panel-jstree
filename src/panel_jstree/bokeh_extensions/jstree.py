@@ -41,13 +41,13 @@ class jsTreePlot(HTMLBox):
     multiple = Bool(default=True)
     show_icons = Bool(default=True)
     show_dots = Bool(default=True)
-    _last_opened = Any()
-    _new_nodes = Any()
+    _last_opened = Dict(String, Any)
+    _new_nodes = List(Any)
     _flat_tree = List(Any)
 
     # Callback properties
     value = List(Any)
-    data = List(Any)
+    _data = List(Any)
 
     checkbox = Bool()
     directory = String()

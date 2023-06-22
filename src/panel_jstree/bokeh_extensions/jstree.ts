@@ -2,6 +2,9 @@ import * as p from "@bokehjs/core/properties"
 import { div } from "@bokehjs/core/dom"
 import {HTMLBox, HTMLBoxView, set_size} from "./layout"
 
+type Node = {
+  [key: string]: any;
+};
 
 declare function jQuery(...args: any[]): any
 
@@ -9,7 +12,7 @@ function ID() {
     // Math.random should be unique because of its seeding algorithm.
     // Convert it to base 36 (numbers + letters), and grab the first 9 characters
     // after the decimal.
-    return '_' + Math.random().toString(36).substr(2, 9);
+    return '_' + Math.random().toString(36).substring(2, 11);
 }
 
 export class jsTreePlotView extends HTMLBoxView {
@@ -27,7 +30,7 @@ export class jsTreePlotView extends HTMLBoxView {
     connect_signals(): void {
         console.log("connect")
         super.connect_signals()
-        this.connect(this.model.properties.data.change, () => this._update_tree_from_data())
+        this.connect(this.model.properties._data.change, () => this._update_tree_from_data())
         this.connect(this.model.properties.value.change, () => this._update_selection_from_value())
         this.connect(this.model.properties._new_nodes.change, () => this._update_tree_from_new_nodes())
         this.connect(this.model.properties.show_icons.change, () => this._setShowIcons())
@@ -36,7 +39,7 @@ export class jsTreePlotView extends HTMLBoxView {
         console.log(this.model.show_dots)
         console.log(this.model.show_icons)
     }
-    //
+
     render(): void {
         super.render()
         this._id = ID()
@@ -52,7 +55,7 @@ export class jsTreePlotView extends HTMLBoxView {
 
         this._jstree = jQuery(this._container).jstree(
             { "core":
-                {"data": this.model.data, "check_callback": true,
+                {"data": this.model._data, "check_callback": true,
                  "multiple": this.model.multiple,
                  "themes": {
                     "dots": this.model.show_dots,
@@ -72,22 +75,35 @@ export class jsTreePlotView extends HTMLBoxView {
         this._jstree.on('refresh.jstree', ({}, {}) => this._update_selection_from_value());
 
         // Sync state with model
-        this._jstree.on('changed.jstree', (e: any, data: any) => this._update_code_from_editor(e, data));
+        // this._jstree.on('changed.jstree', (e: any, data: any) => this._update_code_from_editor(e, data));
         this._jstree.on('before_open.jstree', (e: any, data: any) => this._listen_for_node_open(e, data));
 
     }
 
     _update_code_from_editor({}, data: any): void {
-        this.model.value = data.instance.get_selected();
+        console.log("update code from editor")
+        // this.model.value = data.instance.get_selected();
+        data
     }
     _update_selection_from_value(): void {
-        console.log("last selected: ", this._last_selected)
-        let deselected = this._last_selected.filter(x => !this.model.value.includes(x));
-        console.log("values: ", this.model.value)
+        console.log("update selection from value")
         this._jstree.jstree(true).select_node(this.model.value)
-        console.log("deselected: ", deselected)
-        this._jstree.jstree(true).deselect_node(deselected)
+        // We sometimes have to fire this function more than once per value change because of
+        // calling jstree.refresh, so we check to see if model.value has really changed
+        // by comparing to last_selected
+        if (this.model.value != this._last_selected) {
+            let deselected = this._last_selected.filter(x => !this.model.value.includes(x));
+            this._jstree.jstree(true).deselect_node(deselected)
+        }
         this._last_selected = this.model.value
+
+
+        if (this.model.show_icons) {
+            this._jstree.jstree(true).show_icons ( );
+        }
+        else {
+            this._jstree.jstree(true).hide_icons ( );
+        }
     }
 
     _update_tree_from_new_nodes(): void {
@@ -96,19 +112,31 @@ export class jsTreePlotView extends HTMLBoxView {
             this._jstree.jstree(true).create_node(node["parent"], node, "first")
         }
         this._jstree.jstree(true).settings.core.data = this._jstree.jstree(true).get_json(null, {no_li_attr: true, no_a_attr: true, no_data: true})
-        this.model.data = this._jstree.jstree(true).settings.core.data
+        this.model._data = this._jstree.jstree(true).settings.core.data
         // this._update_selection_from_value()
     }
 
     _update_tree_from_data(): void {
         console.log("updating data")
-        this._jstree.jstree(true).settings.core.data = this.model.data;
-        console.log("flat tree: ", this.model._flat_tree)
+        this._jstree.jstree(true).settings.core.data = this.model._data;
+        console.log("data: ", this._jstree.jstree(true).settings.core.data)
         this.model._flat_tree = this._jstree.jstree(true).get_json(null, {"flat": true})
+        console.log("flat tree: ", this.model._flat_tree)
+        console.log("value after data", this.model.value)
+        // This will redraw the tree if we swap out the data with new data
+        // we set forget_state to true, so the current state is not reapplied
+        // letting whatever state is set in the new data (open or closed, selected, etc)
+        // be the new state
+        this._jstree.jstree(true).refresh(
+            {"skip_loading": false,
+            "forget_state": true});
+
+        console.log("value after refresh", this.model.value)
     }
 
 
     _setShowIcons(): void {
+        console.log("setShowIcons")
         if (this.model.show_icons) {
             this._jstree.jstree(true).show_icons ( );
         }
@@ -117,6 +145,7 @@ export class jsTreePlotView extends HTMLBoxView {
         }
     }
     _setShowDots(): void {
+        console.log("setShowDots")
         if (this.model.show_dots) {
             this._jstree.jstree(true).show_dots ( );
         }
@@ -126,6 +155,7 @@ export class jsTreePlotView extends HTMLBoxView {
     }
 
     _setMultiple(): void {
+        console.log("setMultiple")
         this._jstree.jstree(true).settings.core.multiple = this.model.multiple
     }
 
@@ -134,9 +164,18 @@ export class jsTreePlotView extends HTMLBoxView {
     }
 
     _listen_for_node_open({}, data: any): void {
-        console.log("node opened")
-        console.log("openeing node: ", data.node)
+        console.log("listen for node open")
+        data.node = this.add_node_children(data.node)
         this.model._last_opened = data.node
+    }
+
+    add_node_children(node: Node): Node {
+        console.log("add node children")
+        node["children_nodes"] = [];
+        for (let child of node.children){
+            node.children_nodes.push(this._jstree.jstree(true).get_node(child))
+        }
+        return node
     }
 
 }
@@ -144,7 +183,7 @@ export class jsTreePlotView extends HTMLBoxView {
 export namespace jsTreePlot {
   export type Attrs = p.AttrsOf<Props>
   export type Props = HTMLBox.Props & {
-    data: p.Property<any>
+    _data: p.Property<any>
     plugins: p.Property<any>
     multiple: p.Property<boolean>
     show_icons: p.Property<boolean>
@@ -172,13 +211,13 @@ export class jsTreePlot extends HTMLBox {
 
       this.define<jsTreePlot.Props>(({Array, Any, Boolean}) => ({
         value:          [ Array(Any), []     ],
-        data:          [ Array(Any), []     ],
+        _data:          [ Array(Any), []     ],
         plugins:       [ Array(Any), []     ],
         multiple:      [ Boolean, true ],
         show_icons:    [ Boolean, true ],
         show_dots:     [ Boolean, true ],
         _last_opened: [ Any, {} ],
-        _new_nodes: [ Any, {} ],
+        _new_nodes: [ Array(Any), [] ],
         _flat_tree: [ Array(Any), []     ],
       }))
     }

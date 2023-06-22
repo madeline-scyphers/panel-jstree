@@ -8,7 +8,7 @@ import copy
 import logging
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, AnyStr, ClassVar, Optional, Type
+from typing import TYPE_CHECKING, Any, AnyStr, ClassVar, Optional, Type, Mapping
 
 import param
 from panel.util import fullpath
@@ -30,7 +30,7 @@ class _TreeBase(Widget):
 
     value = param.List(default=[], doc="List of currently selected leaves and nodes")
 
-    data = param.List(
+    _data = param.List(
         default=[],
         doc="Hierarchical tree structure of data. See "
         " `jsTree <https://www.jstree.com>`_ for more"
@@ -55,23 +55,47 @@ class _TreeBase(Widget):
         "to jsTree."
     )
 
-    _last_opened = param.Dict(doc="last opened node")
+    _get_children_cb = param.Callable(
+        doc="Function that is called to load new children nodes. "
+            "First argument should be the text representation of the parent,"
+            "The second argument should be the unique id of the parent"  # TODO write this out more
+    )
+
+    _get_parents_cb = param.Callable(
+        doc="Function that is called on a value to load all the parents"  # TODO write this out more
+    )
+
+    # Add a cb for getting parents (fileselector: map(str, Path(value).parents))
+
+    _last_opened = param.Dict(doc="Last opened node data (JSON)")
 
     _new_nodes = param.List(doc="Children to push to tree")
 
     _flat_tree = param.List(doc="Flat representation of tree")
 
-    _rename = {"select_multiple": "multiple"}
+    _rename: ClassVar[Mapping[str, str | None]] = {
+        "select_multiple": "multiple",
+        "_get_children_cb": None,
+        "_get_parents_cb": None,
+    }
 
     _widget_type: ClassVar[Type[Model]] = jsTreePlot
+
+    def __init__(self, **params):
+        super().__init__(**params)
+        if self._get_children_cb:
+            self._get_children_cb = self._get_children_cb_wrapper(self._get_children_cb)
+            self.param.watch(self.add_children_on_node_open, "_last_opened")
+            if self._get_parents_cb:
+                self.param.watch(self.add_children_on_new_values, "value", onlychanged=False)
 
     @property
     def flat_tree(self):
         return self._flat_tree
 
-    @property
+    @property  # TODO this is only need in File tree b/c it does special value processing
     def _values(self):
-        return [os.path.normpath(p) for p in self.value]
+        return self.value
 
     def _process_param_change(self, msg: dict[str, Any]) -> dict[str, Any]:
         """
@@ -95,7 +119,112 @@ class _TreeBase(Widget):
             properties.get("plugins", []).append("checkbox")
 
         properties["value"] = self._values
+        properties["value"] = self._values
         return properties
+
+    # @param.depends("value", watch=True)
+    def add_children_on_new_values(self, *event):
+        def transverse(d: list, value):
+            # parents = Path(value).parents
+            parents = self._get_parents_cb(value)
+            # parents = map(str, Path(value).parents)
+            for node in d:
+                if node["id"] == value:
+                    break
+                if node["id"] in parents:
+                    node.setdefault("state", {})["opened"] = True
+                    if node.get("children"):
+                        transverse(node["children"], value)
+                    else:
+                        node["children"] = self._get_children_cb(
+                            node["text"], node["id"], state={"opened": True}, depth=2
+                        )
+                        [
+                            transverse([n], value)
+                            for n in node["children"]
+                            if n["id"] in parents
+                        ]
+                    break
+
+        ids = [node["id"] for node in self._flat_tree]
+        values = [value for value in self._values if value not in ids]
+        if values:
+            # data = copy.deepcopy(event.obj._data[:])
+            data = copy.deepcopy(self._data[:])
+
+            for value in values:
+                transverse(data, value)
+            self._data = data
+            # self.param.update(**{"_data": data, "value": self.value})
+
+    def add_children_on_node_open(self, event: param.parameterized.Event, **kwargs):  # rename to add grandchildren?
+        new_nodes = []
+        nodes_already_sent = event.new.get("children_d", [])
+        # data = event.new["children"]
+        children_nodes = event.new["children_nodes"]
+        for node in children_nodes:
+            children = self._get_children_cb(
+                node["text"],
+                node["id"],
+                **{"children_to_skip": nodes_already_sent, **kwargs}
+            )
+            if children:
+                new_nodes.extend(children)
+        self._new_nodes = new_nodes
+
+    @staticmethod
+    def to_json(
+            id_, label, parent: str = None, children: Optional[list] = None, icon: str = None, **kwargs
+    ):
+        jsn = dict(id=id_, text=label, **kwargs)
+        if parent:
+            jsn["parent"] = parent
+        if children:
+            jsn["children"] = children
+        if icon:
+            jsn["icon"] = icon
+        # jsn["icon"] = "jstree-leaf"
+        return jsn
+
+    def _get_children_cb_wrapper(self, get_children_cb):
+        def inner(text, id_, *args, **kwargs):
+            jsn = get_children_cb(text, id_, *args, **kwargs)
+            # TODO this doesn't work right now b/c of comparisons of value to id
+            # if self._data:  # we already have a tree
+            #     for node in jsn:
+
+
+
+
+
+            #     if "id" not in node:
+            #         node["id"] = uuid.uuid4().hex
+            return jsn
+        return inner
+
+
+class Tree(_TreeBase):
+    """"""
+    def __init__(self, data, **params):
+        if "get_children_cb" in params:
+            params["_get_children_cb"] = params.pop("get_children_cb")
+        super().__init__(_data=data, **params)
+
+    @property
+    def data(self):
+        return self._data
+
+    @data.setter
+    def data(self, value):
+        self._data = value
+
+    @property
+    def get_children_cb(self):
+        return self._get_children_cb
+
+    @get_children_cb.setter
+    def get_children_cb(self, value):
+        self._get_children_cb = value
 
 
 class FileTree(_TreeBase):
@@ -106,6 +235,10 @@ class FileTree(_TreeBase):
         doc="""
         The directory to explore.""",
     )
+
+    @property
+    def _values(self):
+        return [os.path.normpath(p) for p in self.value]
 
     def _process_param_change(self, msg: dict[str, Any]) -> dict[str, Any]:
         """
@@ -124,82 +257,36 @@ class FileTree(_TreeBase):
             params["directory"] = fullpath(directory)
         self._file_icon = "jstree-file"
         self._folder_icon = "jstree-folder"
-        super().__init__(**params)
-        self.data = self._get_child_json(self.directory, depth=1)
-        self.param.watch(self._add_node_children, "_last_opened")
-        self.param.watch(self._new_nodes_on_value_update, "value")
 
-    def _new_nodes_on_value_update(self, event):
-        def transverse(d: list, value):
-            parents = Path(value).parents
-            for node in d:
-                if Path(node["id"]) == Path(value):
-                    break
-                if Path(node["id"]) in parents:
-                    node.setdefault("state", {})["opened"] = True
-                    if node.get("children"):
-                        transverse(node["children"], value)
-                    else:
-                        node["children"] = self._get_child_json(
-                            node["id"], add_parent=True, state={"opened": True}, depth=2
-                        )
-                        [
-                            transverse([n], value)
-                            for n in node["children"]
-                            if Path(n["id"]) in parents
-                        ]
-                    break
+        super().__init__(_get_children_cb=self._get_children, _get_parents_cb=lambda value: list(map(str, Path(value).parents)), **params)
+        self._data = [{"id": self.directory,
+                       "text": Path(self.directory).name,
+                       "icon": self._folder_icon,
+                       "state": {"opened": True},
+                       "children": self._get_children_cb(Path(self.directory).name, self.directory,  depth=1)
+                       }]
 
-        ids = [node["id"] for node in self._flat_tree]
-        values = [value for value in self._values if value not in ids]
-        if values:
-            data = copy.deepcopy(event.obj.data[:])
-
-            for value in values:
-                transverse(data, value)
-            self.data = data
-
-    def _add_node_children(self, event: param.parameterized.Event = None, dirs=None, **kwargs):
-        new_nodes = []
-        kw = {}
-        if not dirs:
-            if event:
-                nodes_already_sent = event.new.get("children_d", [])
-                dirs = event.new["children"]
-                kw = dict(
-                    add_parent=True,
-                    children_to_skip=nodes_already_sent,
-                )
-            else:
-                dirs = [self.directory]
-                kw = dict(depth=1)
-        for dir_ in dirs:
-            children = self._get_child_json(dir_, **{**kwargs, **kw})
-            if children:
-                new_nodes.extend(children)
-        self._new_nodes = new_nodes
-
-    def _get_child_json(
-        self, directory: str, add_parent=False, depth=0, children_to_skip=(), **kwargs
+    def _get_children(
+        self, text: str, directory: str, depth=0, children_to_skip=(), **kwargs
     ):
         directory = str(directory)
-        parent = directory if add_parent else None
+        parent = directory
         jsn = []
         if not os.path.isdir(directory):
             return []
         dirs, files = self._get_paths(directory, children_to_skip=children_to_skip)
         for dir in dirs:
             if depth > 0:
-                children = self._get_child_json(dir, add_parent=add_parent, depth=depth - 1)
+                children = self._get_children(Path(dir).name, dir, depth=depth - 1)
             else:
                 children = None
             jsn.append(
-                self._get_json(
-                    dir, parent=parent, children=children, icon=self._folder_icon, **kwargs
+                self.to_json(
+                    id_=dir, label=Path(dir).name, parent=parent, children=children, icon=self._folder_icon, **kwargs
                 )
             )
         jsn.extend(
-            self._get_json(file, parent=parent, icon=self._file_icon, **kwargs) for file in files
+            self.to_json(id_=file, label=Path(file).name, parent=parent, icon=self._file_icon, **kwargs) for file in files
         )
         return jsn
 
@@ -219,14 +306,3 @@ class FileTree(_TreeBase):
         files = [f for f in files if f not in children_to_skip]
         return dirs, files
 
-    def _get_json(
-        self, txt, parent: str = None, children: Optional[list] = None, icon: str = None, **kwargs
-    ):
-        jsn = dict(id=txt, text=Path(txt).name, **kwargs)
-        if parent:
-            jsn["parent"] = parent
-        if children:
-            jsn["children"] = children
-        if icon:
-            jsn["icon"] = icon
-        return jsn
