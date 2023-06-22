@@ -122,12 +122,9 @@ class _TreeBase(Widget):
         properties["value"] = self._values
         return properties
 
-    # @param.depends("value", watch=True)
     def add_children_on_new_values(self, *event):
         def transverse(d: list, value):
-            # parents = Path(value).parents
             parents = self._get_parents_cb(value)
-            # parents = map(str, Path(value).parents)
             for node in d:
                 if node["id"] == value:
                     break
@@ -137,7 +134,7 @@ class _TreeBase(Widget):
                         transverse(node["children"], value)
                     else:
                         node["children"] = self._get_children_cb(
-                            node["text"], node["id"], state={"opened": True}, depth=2
+                            node["text"], node["id"], depth=2
                         )
                         [
                             transverse([n], value)
