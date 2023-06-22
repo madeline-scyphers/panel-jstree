@@ -231,7 +231,7 @@ class FileTree(_TreeBase):
 
     @property
     def _values(self):
-        return [os.path.normpath(p) for p in self.value]
+        return [os.path.expanduser(os.path.normpath(p)) for p in self.value]
 
     def _process_param_change(self, msg: dict[str, Any]) -> dict[str, Any]:
         """
