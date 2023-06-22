@@ -10,7 +10,7 @@ pn.extension("tree")
 def view():
     text_input = pn.widgets.TextInput(name="Text Input", placeholder="Enter a string here...")
     ft = FileTree(
-        "..",
+        ".",
         select_multiple=False,
         # checkbox=False,
     )

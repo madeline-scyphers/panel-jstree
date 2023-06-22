@@ -66,25 +66,33 @@ export class jsTreePlotView extends HTMLBoxView {
                 ...kw
             }
             );
-
         this.init_callbacks()
     }
     init_callbacks(): void {
+        // Initialization
+        this._jstree.on('ready.jstree', ({}, {}) => this.onjsTreeInit());
+
         // Rendering callbacks
         // TODO: do I need both of these?
         this._jstree.on('refresh.jstree', ({}, {}) => this._update_selection_from_value());
 
         // Sync state with model
-        // this._jstree.on('changed.jstree', (e: any, data: any) => this._update_code_from_editor(e, data));
+        this._jstree.on('activate_node.jstree', ({}, data: any) => this.selectNodeFromEditor({}, data));
         this._jstree.on('before_open.jstree', (e: any, data: any) => this._listen_for_node_open(e, data));
 
     }
 
-    _update_code_from_editor({}, data: any): void {
-        console.log("update code from editor")
-        // this.model.value = data.instance.get_selected();
-        data
+    onjsTreeInit(): void {
+        this.model._flat_tree = this._jstree.jstree(true).get_json(null, {"flat": true})
+        console.log("flat tree: ", this.model._flat_tree)
     }
+
+    selectNodeFromEditor({}, data: any): void {
+        console.log("select pre", this.model.value)
+        this.model.value = data.instance.get_selected();
+        console.log("select post", this.model.value)
+    }
+
     _update_selection_from_value(): void {
         console.log("update selection from value")
         this._jstree.jstree(true).select_node(this.model.value)
@@ -95,7 +103,8 @@ export class jsTreePlotView extends HTMLBoxView {
             let deselected = this._last_selected.filter(x => !this.model.value.includes(x));
             this._jstree.jstree(true).deselect_node(deselected)
         }
-        this._last_selected = this.model.value
+        // We choose get_selected
+        this._last_selected = this.model.value;
 
 
         if (this.model.show_icons) {

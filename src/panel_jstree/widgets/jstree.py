@@ -119,7 +119,6 @@ class _TreeBase(Widget):
             properties.get("plugins", []).append("checkbox")
 
         properties["value"] = self._values
-        properties["value"] = self._values
         return properties
 
     def add_children_on_new_values(self, *event):
@@ -136,11 +135,9 @@ class _TreeBase(Widget):
                         node["children"] = self._get_children_cb(
                             node["text"], node["id"], depth=2
                         )
-                        [
-                            transverse([n], value)
-                            for n in node["children"]
-                            if n["id"] in parents
-                        ]
+                        for n in node["children"]:
+                            if n["id"] in parents:
+                                transverse([n], value)
                     break
 
         ids = [node["id"] for node in self._flat_tree]
@@ -152,7 +149,6 @@ class _TreeBase(Widget):
             for value in values:
                 transverse(data, value)
             self._data = data
-            # self.param.update(**{"_data": data, "value": self.value})
 
     def add_children_on_node_open(self, event: param.parameterized.Event, **kwargs):  # rename to add grandchildren?
         new_nodes = []
