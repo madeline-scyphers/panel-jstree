@@ -228,7 +228,17 @@ class FileTree(_TreeBase):
 
     @property
     def _values(self):
-        return [os.path.expanduser(os.path.normpath(p)) for p in self.value]
+        # normpath removes any ending slashes that mess up jstree
+        # expand user lets people use things like ~ for home
+        values = [os.path.expanduser(os.path.normpath(p)) for p in self.value]
+
+        # This lets people use paths relative to self.directory
+        for i, value in enumerate(values):
+            value = Path(value)
+            if not value.is_absolute():
+                values[i] = str(Path(self.directory).parent / value)
+
+        return values
 
     def _process_param_change(self, msg: dict[str, Any]) -> dict[str, Any]:
         """
