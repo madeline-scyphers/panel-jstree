@@ -15,7 +15,7 @@ from panel_jstree import FileTree
 pn.Column(FileTree())
 ```
 
-![Project Intro](https://github.com/madeline-scyphers/panel-jstree/blob/c0c182e09f028fe0fdb963d82ab2cdaad5128a1b/assets/videos/project-intro.gif)
+![Project Intro](https://raw.githubusercontent.com/madeline-scyphers/panel-jstree/main/assets/videos/project-intro.gif)
 
 ## 🚀 Get started in under a minute
 
@@ -31,11 +31,11 @@ panel serve examples/*.py --show
 
 Here are some of the examples. You can see a small FileTree app with a text field and controls to directly input a file path, and turn off and on some of the controls.
 
-![FileTree App Example](https://github.com/madeline-scyphers/panel-jstree/blob/777b299badf308746ff2ea0843755a12fe6158b4/assets/videos/file-tree.gif)
+![FileTree App Example](https://raw.githubusercontent.com/madeline-scyphers/panel-jstree/main/assets/videos/file-tree.gif)
 
 You can also see a generic Tree app with a custom callback to generate random nodes.
 
-![Randomw Tree App Example](https://github.com/madeline-scyphers/panel-jstree/blob/777b299badf308746ff2ea0843755a12fe6158b4/assets/videos/random-tree.gif)
+![Randomw Tree App Example](https://raw.githubusercontent.com/madeline-scyphers/panel-jstree/main/assets/videos/random-tree.gif)
 
 
 ## ⭐ Support

@@ -46,12 +46,13 @@ And update the version in [package.json](src/panel_jstree/package.json) (example
 ```bash
 git add src/panel_jstree/__init__.py src/panel_jstree/package.json
 git commit -m "Version 1.0.0"
+git push
 ```
 
 Then tag a new version (example listed v1.0.0)
 
 ```bash
-git tag -a v1.0.0 -m "Some message"
+git tag -a v1.0.0 -m "Version 1.0.0 Release"
 git push origin v1.0.0
 ```
 
