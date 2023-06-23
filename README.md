@@ -46,11 +46,11 @@ Here are some of the examples. You can see a small FileTree app with a text fiel
 
 You can make a simple tree where you swap out the data.
 
-![Randomw Tree App Example](https://raw.githubusercontent.com/madeline-scyphers/panel-jstree/main/assets/videos/simple-tree.gif)
+![Simple Tree App Example](https://raw.githubusercontent.com/madeline-scyphers/panel-jstree/main/assets/videos/simple_tree.gif)
 
 You can also see a generic Tree app with a custom callback to generate random nodes.
 
-![Randomw Tree App Example](https://raw.githubusercontent.com/madeline-scyphers/panel-jstree/main/assets/videos/random-tree.gif)
+![Random Tree App Example](https://raw.githubusercontent.com/madeline-scyphers/panel-jstree/main/assets/videos/random-tree.gif)
 
 
 ## ⭐ Support
