@@ -71,7 +71,7 @@ I would love to support and receive your contributions. Thanks.
 |                 |                                                                                                                                                                         |
 |-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Conda Install   | [![Conda Version](https://anaconda.org/conda-forge/panel-jstree/badges/version.svg)](https://anaconda.org/conda-forge/panel-jstree)                                     |
-| PyPI Install    | [![PyPI version](https://badge.fury.io/py/panel-jstree.svg)](https://badge.fury.io/py/panel-jstree)                                                                     |
+| PyPI Install    | [![PyPI version](https://badge.fury.io/py/panel-jstree.svg)](https://pypi.org/project/panel-jstree)                                                                     |
 | Github release  | [![Github tag](https://img.shields.io/github/v/tag/madeline-scyphers/panel-jstree.svg?label=tag&colorB=11ccbb)](https://github.com/madeline-scyphers/panel-jstree/tags) |
 | Python Versions | ![Python Versions](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10-blue)                                                                               |
 | License         | [![License](https://img.shields.io/badge/License-MIT%202.0-blue.svg)](https://opensource.org/licenses/MIT)                                                              |
