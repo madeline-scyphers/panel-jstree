@@ -56,7 +56,8 @@ export class jsTreePlotView extends HTMLBoxView {
 
         let kw = {"checkbox": {
             "three_state": false,
-            "cascade": "undetermined"}}
+            "cascade": "undetermined"
+        }}
 
         this._jstree = jQuery(this._container).jstree(
             { "core":
@@ -75,19 +76,19 @@ export class jsTreePlotView extends HTMLBoxView {
     }
     init_callbacks(): void {
         // Initialization
-        this._jstree.on('ready.jstree', ({}, {}) => this.onjsTreeInit());
 
         // Rendering callbacks
         // TODO: do I need both of these?
         this._jstree.on('refresh.jstree', ({}, {}) => this._update_selection_from_value());
 
         // Sync state with model
+        this._jstree.on('model.jstree', ({}, {}) => this.onNewData());
         this._jstree.on('activate_node.jstree', ({}, data: any) => this.selectNodeFromEditor({}, data));
         this._jstree.on('before_open.jstree', (e: any, data: any) => this._listen_for_node_open(e, data));
 
     }
 
-    onjsTreeInit(): void {
+    onNewData(): void {
         this.model._flat_tree = this._jstree.jstree(true).get_json(null, {"flat": true})
         console.log("flat tree: ", this.model._flat_tree)
     }
@@ -111,13 +112,6 @@ export class jsTreePlotView extends HTMLBoxView {
         // We choose get_selected
         this._last_selected = this.model.value;
 
-
-        if (this.model.show_icons) {
-            this._jstree.jstree(true).show_icons ( );
-        }
-        else {
-            this._jstree.jstree(true).hide_icons ( );
-        }
     }
 
     _update_tree_from_new_nodes(): void {
@@ -134,18 +128,21 @@ export class jsTreePlotView extends HTMLBoxView {
         console.log("updating data")
         this._jstree.jstree(true).settings.core.data = this.model._data;
         console.log("data: ", this._jstree.jstree(true).settings.core.data)
-        this.model._flat_tree = this._jstree.jstree(true).get_json(null, {"flat": true})
-        console.log("flat tree: ", this.model._flat_tree)
         console.log("value after data", this.model.value)
         // This will redraw the tree if we swap out the data with new data
         // we set forget_state to true, so the current state is not reapplied
-        // letting whatever state is set in the new data (open or closed, selected, etc)
+        // letting whatever state is set in the new data (open or closed, etc)
         // be the new state
         this._jstree.jstree(true).refresh(
             {"skip_loading": false,
             "forget_state": true});
 
+        // selected state is not preserved correctly right now, so we then
+        // deselect everything because that is better than getting it wrong
+        this._jstree.jstree(true).deselect_all({"supress_event": true})
+
         console.log("value after refresh", this.model.value)
+        console.log("data after refresh", this._jstree.jstree(true).settings.core.data)
     }
 
     _setShowIcons(): void {

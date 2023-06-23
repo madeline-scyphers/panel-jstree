@@ -12,7 +12,6 @@ A = [
          'text' : 'Root node 2',
          'state' : {
            'opened' : True,
-           'selected' : True
          },
          'children' : [
            { 'text' : 'Child 1' },
