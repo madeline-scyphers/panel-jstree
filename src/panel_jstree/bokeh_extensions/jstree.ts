@@ -33,6 +33,7 @@ export class jsTreePlotView extends HTMLBoxView {
         this.connect(this.model.properties._data.change, () => this._update_tree_from_data())
         this.connect(this.model.properties.value.change, () => this._update_selection_from_value())
         this.connect(this.model.properties._new_nodes.change, () => this._update_tree_from_new_nodes())
+        this.connect(this.model.properties.checkbox.change, () => this.setCheckboxes())
         this.connect(this.model.properties.show_icons.change, () => this._setShowIcons())
         this.connect(this.model.properties.show_dots.change, () => this._setShowDots())
         this.connect(this.model.properties.multiple.change, () => this._setMultiple())
@@ -48,6 +49,10 @@ export class jsTreePlotView extends HTMLBoxView {
         set_size(this._container, this.model)
         this.shadow_el.appendChild(this._container);
         console.log(this._container)
+
+        if (this.model.checkbox) {
+            this.model.plugins.push("checkbox")
+        }
 
         let kw = {"checkbox": {
             "three_state": false,
@@ -143,7 +148,6 @@ export class jsTreePlotView extends HTMLBoxView {
         console.log("value after refresh", this.model.value)
     }
 
-
     _setShowIcons(): void {
         console.log("setShowIcons")
         if (this.model.show_icons) {
@@ -163,12 +167,22 @@ export class jsTreePlotView extends HTMLBoxView {
         }
     }
 
+    setCheckboxes(): void {
+        console.log("setCheckBoxes")
+        if (this.model.checkbox) {
+            this._jstree.jstree(true).show_checkboxes();
+        }
+        else {
+            this._jstree.jstree(true).hide_checkboxes();
+        }
+    }
+
     _setMultiple(): void {
         console.log("setMultiple")
         this._jstree.jstree(true).settings.core.multiple = this.model.multiple
     }
 
-    _update_tree_theme_from_model(): void {
+    _update_tree_theme_from_model(): void {  // TODO can we remove this?
         this._jstree.jstree(true).refresh(false, true);
     }
 
@@ -194,6 +208,7 @@ export namespace jsTreePlot {
   export type Props = HTMLBox.Props & {
     _data: p.Property<any>
     plugins: p.Property<any>
+    checkbox: p.Property<boolean>
     multiple: p.Property<boolean>
     show_icons: p.Property<boolean>
     show_dots: p.Property<boolean>
@@ -222,6 +237,7 @@ export class jsTreePlot extends HTMLBox {
         value:          [ Array(Any), []     ],
         _data:          [ Array(Any), []     ],
         plugins:       [ Array(Any), []     ],
+        checkbox:      [ Boolean, true ],
         multiple:      [ Boolean, true ],
         show_icons:    [ Boolean, true ],
         show_dots:     [ Boolean, true ],

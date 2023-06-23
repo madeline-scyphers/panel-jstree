@@ -115,9 +115,6 @@ class _TreeBase(Widget):
         if properties.get("height") and properties["height"] < 100:
             properties["height"] = 100
 
-        if properties.pop("checkbox", None):
-            properties.get("plugins", []).append("checkbox")
-
         properties["value"] = self._values
         return properties
 

@@ -38,6 +38,7 @@ class jsTreePlot(HTMLBox):
     ]
 
     plugins = List(Any)
+    checkbox = Bool(default=True)
     multiple = Bool(default=True)
     show_icons = Bool(default=True)
     show_dots = Bool(default=True)
