@@ -202,6 +202,9 @@ class Tree(_TreeBase):
 
     @property
     def data(self):
+        """When swapping out data, you are not able to input selections data on nodes.
+        All nodes will start out deselected.
+        """
         return self._data
 
     @data.setter
