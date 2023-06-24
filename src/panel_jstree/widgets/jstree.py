@@ -229,6 +229,17 @@ class FileTree(_TreeBase):
         The directory to explore.""",
     )
 
+    # TODO add this in when figured out if FileTree should be a composite widget or
+    # a pure jsTree widget (should a textbox and back arrow be built in options
+    # or people need to add them themselves)
+    # root_directory = param.String(default=None, doc="""
+    #     If set, overrides directory parameter as the root directory
+    #     beyond which users cannot navigate.
+    #     Currently the only way to set the directory above the
+    #     initial directory is with extra widgets or callbacks that
+    #     manipulate the `value` property.
+    #     """)  # TODO update this comment if this changes
+
     @property
     def _values(self):
         # normpath removes any ending slashes that mess up jstree
@@ -242,6 +253,10 @@ class FileTree(_TreeBase):
                 values[i] = str(Path(self.directory).parent / value)
 
         return values
+    #
+    # @property
+    # def _root_directory(self):
+    #     return self.root_directory or self.directory
 
     def _process_param_change(self, msg: dict[str, Any]) -> dict[str, Any]:
         """
@@ -253,6 +268,7 @@ class FileTree(_TreeBase):
         """
         msg = super()._process_param_change(msg)
         msg.pop("directory", None)
+        msg.pop("root_directory", None)
         return msg
 
     def __init__(self, directory: AnyStr | os.PathLike | None = None, **params):
