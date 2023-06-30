@@ -50,14 +50,19 @@ export class jsTreePlotView extends HTMLBoxView {
         this.shadow_el.appendChild(this._container);
         console.log(this._container)
 
-        if (this.model.checkbox) {
-            this.model.plugins.push("checkbox")
-        }
-
-        let kw = {"checkbox": {
+        let kw: {[k: string]: any} = {"checkbox": {
             "three_state": false,
             "cascade": "undetermined"
         }}
+
+        if (this.model.checkbox) {
+            this.model.plugins.push("checkbox")
+        }
+        if (this.model.drag_and_drop) {
+            this.model.plugins.push("dnd")
+            kw["check_callback"] = true
+        }
+
 
         this._jstree = jQuery(this._container).jstree(
             { "core":
@@ -209,6 +214,7 @@ export namespace jsTreePlot {
     multiple: p.Property<boolean>
     show_icons: p.Property<boolean>
     show_dots: p.Property<boolean>
+    drag_and_drop: p.Property<boolean>
     value: p.Property<any>
     _last_opened: p.Property<any>
     _new_nodes: p.Property<any>
@@ -238,6 +244,7 @@ export class jsTreePlot extends HTMLBox {
         multiple:      [ Boolean, true ],
         show_icons:    [ Boolean, true ],
         show_dots:     [ Boolean, true ],
+        drag_and_drop:     [ Boolean, false ],
         _last_opened: [ Any, {} ],
         _new_nodes: [ Array(Any), [] ],
         _flat_tree: [ Array(Any), []     ],

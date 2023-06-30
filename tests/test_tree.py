@@ -43,7 +43,10 @@ def test_tree_can_construct():
 
 def test_base_tree_app():
     """Construct a BaseTree for manual testing"""
-    tree = Tree(data=A)
+    tree = Tree(
+        data=A,
+        drag_and_drop=True
+    )
 
     settings = pn.Param(
         tree,
