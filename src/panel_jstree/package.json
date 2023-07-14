@@ -6,7 +6,7 @@
   "keywords": [],
   "repository": {},
   "dependencies": {
-    "@bokeh/bokehjs": "^3.1",
+    "@bokeh/bokehjs": "^3.2.0",
     "@holoviz/panel": "^1"
   },
   "files": [
