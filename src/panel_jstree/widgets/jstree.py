@@ -324,4 +324,3 @@ class FileTree(_TreeBase):
         # dirs = [d for d in dirs if not Path(d).name.startswith(".") and d not in children_to_skip]
         files = [f for f in files if f not in children_to_skip]
         return dirs, files
-
