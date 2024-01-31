@@ -6,7 +6,7 @@ channels:
   - defaults
 dependencies:
   - python=3.10
-  - panel>=1
+  - panel>=1.3
   - conda-forge::nodejs>=14
   - black
   - isort

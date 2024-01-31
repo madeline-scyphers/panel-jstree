@@ -12,8 +12,7 @@ from typing import TYPE_CHECKING, Any, AnyStr, ClassVar, Optional, Type, Mapping
 
 import param
 from panel.util import fullpath
-from panel.layout import Column, Panel
-from panel.widgets.base import Widget, CompositeWidget
+from panel.widgets.base import Widget
 from panel.widgets.file_selector import _scan_path
 
 from ..bokeh_extensions.jstree import jsTreePlot
@@ -50,14 +49,10 @@ class _TreeBase(Widget):
 
     checkbox = param.Boolean(default=True, doc="Whether to to use checkboxes as selectables")
 
-    drag_and_drop = param.Boolean(default=False, doc="""
-        This plugin makes it possible to drag and drop tree nodes and rearrange the tree.
-        """)
-
     plugins = param.List(
-        doc="""Configure which additional plugins will be active.
-        Should be an array of strings, where each element is a plugin name that are passed
-        to jsTree."""
+        doc="Configure which additional plugins will be active. "
+        "Should be an array of strings, where each element is a plugin name that are passed"
+        "to jsTree."
     )
 
     _get_children_cb = param.Callable(
@@ -85,8 +80,6 @@ class _TreeBase(Widget):
     }
 
     _widget_type: ClassVar[Type[Model]] = jsTreePlot
-
-    __abstract = True
 
     def __init__(self, **params):
         super().__init__(**params)
@@ -186,12 +179,9 @@ class _TreeBase(Widget):
     def _get_children_cb_wrapper(self, get_children_cb):
         def inner(text, id_, *args, **kwargs):
             jsn = get_children_cb(text, id_, *args, **kwargs)
-            # if "icon" not in jsn:
-            # for node in jsn:
-            #     node["icon"] = str("/public/assets/images/circle-stroked-15.png")
-                # node["icon"] = "jstree-file"
-
+            # TODO this doesn't work right now b/c of comparisons of value to id
             # if self._data:  # we already have a tree
+            #     for node in jsn:
 
 
 
@@ -230,7 +220,7 @@ class Tree(_TreeBase):
         self._get_children_cb = value
 
 
-class FileTreeBase(_TreeBase):
+class FileTree(_TreeBase):
     """"""
 
     directory = param.String(
@@ -334,42 +324,3 @@ class FileTreeBase(_TreeBase):
         # dirs = [d for d in dirs if not Path(d).name.startswith(".") and d not in children_to_skip]
         files = [f for f in files if f not in children_to_skip]
         return dirs, files
-
-
-class FileTree(CompositeWidget):
-    """"""
-
-    _ft_params: ClassVar[list[str]] = [
-        p for p in list(FileTreeBase.param) if p not in ('name', 'height', 'margin')
-    ]
-
-    _composite_type: ClassVar[Type[Panel]] = Column
-
-    def __init__(self, directory: AnyStr | os.PathLike | None = None,  **params):
-        self._filetree = None
-
-        ft_kw = {p: params.pop(p) for p in self._ft_params if params.get(p) is not None}
-        self._filetree = FileTreeBase(
-            directory=directory,
-            **ft_kw
-        )
-        super().__init__(**params)
-        for p in self._ft_params:
-            if getattr(self.param, p, None) is None:
-                self.param.add_parameter(p, getattr(FileTreeBase.param, p))
-
-        self._composite[:] = [self._filetree]
-
-    def __getattribute__(self, name):
-        if (name not in ("_ft_params", "_filetree")  # we can't do it on these b/c we use them later, recursion error
-                and name in self._ft_params  # only forward params in ft widget we have defined above
-                and self._filetree):  # only do it once _filetree is set up
-            return self._filetree.__getattribute__(name)
-        return super().__getattribute__(name)
-
-    def __setattr__(self, name, value):
-        if (name not in ("_ft_params", "_filetree")  # we can't do it on these b/c we use them later, recursion error
-                and name in self._ft_params  # only forward params in ft widget we have defined above
-                and self._filetree):  # only do it once _filetree is set up
-            return self._filetree.__setattr__(name, value)
-        return super().__setattr__(name, value)
