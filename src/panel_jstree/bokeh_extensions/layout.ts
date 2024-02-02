@@ -8,6 +8,16 @@ import * as p from "@bokehjs/core/properties"
 export class PanelMarkupView extends WidgetView {
   container: HTMLDivElement
   model: Markup
+  _initialized_stylesheets: any
+
+  connect_signals(): void {
+    super.connect_signals()
+    const {width, height, min_height, max_height, margin, sizing_mode} = this.model.properties;
+    this.on_change([width, height, min_height, max_height, margin, sizing_mode], () => {
+      set_size(this.el, this.model)
+      set_size(this.container, this.model, false)
+    });
+  }
 
   override async lazy_initialize() {
     await super.lazy_initialize()
@@ -19,11 +29,24 @@ export class PanelMarkupView extends WidgetView {
       })
   }
 
-  override connect_signals(): void {
-    super.connect_signals()
-    this.connect(this.model.change, () => {
-      this.render()
-    })
+  watch_stylesheets(): void {
+    this._initialized_stylesheets = {}
+    for (const sts of this._applied_stylesheets) {
+      const style_el = (sts as any).el
+      if (style_el instanceof HTMLLinkElement) {
+	this._initialized_stylesheets[style_el.href] = false
+	style_el.addEventListener("load", () => {
+	  this._initialized_stylesheets[style_el.href] = true
+	  if (
+	    Object.values(this._initialized_stylesheets).every(Boolean)
+	  )
+	    this.style_redraw()
+	})
+      }
+    }
+  }
+
+  style_redraw(): void {
   }
 
   has_math_disabled() {
@@ -111,6 +134,14 @@ export function set_size(el: HTMLElement, model: HTMLBox, adjustMargin: boolean 
 export abstract class HTMLBoxView extends LayoutDOMView {
   override model: HTMLBox
   _initialized_stylesheets: any
+
+  connect_signals(): void {
+    super.connect_signals()
+    const {width, height, min_height, max_height, margin, sizing_mode} = this.model.properties;
+    this.on_change([width, height, min_height, max_height, margin, sizing_mode], () => {
+      set_size(this.el, this.model)
+    });
+  }
 
   render(): void {
     super.render()
