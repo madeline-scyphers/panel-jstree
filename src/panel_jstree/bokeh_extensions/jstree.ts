@@ -28,7 +28,7 @@ export class jsTreePlotView extends HTMLBoxView {
     }
 
     connect_signals(): void {
-        console.log("connect")
+        // console.log("connect")
         super.connect_signals()
         this.connect(this.model.properties._data.change, () => this._update_tree_from_data())
         this.connect(this.model.properties.value.change, () => this._update_selection_from_value())
@@ -37,32 +37,28 @@ export class jsTreePlotView extends HTMLBoxView {
         this.connect(this.model.properties.show_icons.change, () => this._setShowIcons())
         this.connect(this.model.properties.show_dots.change, () => this._setShowDots())
         this.connect(this.model.properties.multiple.change, () => this._setMultiple())
-        console.log(this.model.show_dots)
-        console.log(this.model.show_icons)
+        // console.log(this.model.show_dots)
+        // console.log(this.model.show_icons)
     }
 
     render(): void {
         super.render()
         this._id = ID()
-        console.log(this._id)
+        // console.log(this._id)
         this._container = div({id: this._id, style: "overflow: auto; minHeight: 200px; minWidth: 200px;"},)
         set_size(this._container, this.model)
         this.shadow_el.appendChild(this._container);
-        console.log(this._container)
+        // console.log(this._container)
 
         let kw: {[k: string]: any} = {"checkbox": {
             "three_state": false,
             "cascade": "undetermined"
         }}
 
-        if (this.model.checkbox) {
+        // console.log("plugins: ", this.model.plugins)
+        if (this.model.checkbox && !this.model.plugins.includes("checkbox")) {
             this.model.plugins.push("checkbox")
         }
-        if (this.model.drag_and_drop) {
-            this.model.plugins.push("dnd")
-            kw["check_callback"] = true
-        }
-
 
         this._jstree = jQuery(this._container).jstree(
             { "core":
@@ -95,17 +91,17 @@ export class jsTreePlotView extends HTMLBoxView {
 
     onNewData(): void {
         this.model._flat_tree = this._jstree.jstree(true).get_json(null, {"flat": true})
-        console.log("flat tree: ", this.model._flat_tree)
+        // console.log("Flat tree: ", this.model._flat_tree)
     }
 
     selectNodeFromEditor({}, data: any): void {
-        console.log("select pre", this.model.value)
+        // console.log("select pre", this.model.value)
         this.model.value = data.instance.get_selected();
-        console.log("select post", this.model.value)
+        // console.log("select post", this.model.value)
     }
 
     _update_selection_from_value(): void {
-        console.log("update selection from value")
+        // console.log("update selection from value")
         this._jstree.jstree(true).select_node(this.model.value)
         // We sometimes have to fire this function more than once per value change because of
         // calling jstree.refresh, so we check to see if model.value has really changed
@@ -120,7 +116,7 @@ export class jsTreePlotView extends HTMLBoxView {
     }
 
     _update_tree_from_new_nodes(): void {
-        console.log("new nodes: ", this.model._new_nodes)
+        // console.log("new nodes: ", this.model._new_nodes)
         for (let node of this.model._new_nodes){
             this._jstree.jstree(true).create_node(node["parent"], node, "first")
         }
@@ -130,10 +126,10 @@ export class jsTreePlotView extends HTMLBoxView {
     }
 
     _update_tree_from_data(): void {
-        console.log("updating data")
+        // console.log("updating data")
         this._jstree.jstree(true).settings.core.data = this.model._data;
-        console.log("data: ", this._jstree.jstree(true).settings.core.data)
-        console.log("value after data", this.model.value)
+        // console.log("data: ", this._jstree.jstree(true).settings.core.data)
+        // console.log("value after data", this.model.value)
         // This will redraw the tree if we swap out the data with new data
         // we set forget_state to true, so the current state is not reapplied
         // letting whatever state is set in the new data (open or closed, etc)
@@ -146,12 +142,12 @@ export class jsTreePlotView extends HTMLBoxView {
         // deselect everything because that is better than getting it wrong
         this._jstree.jstree(true).deselect_all({"supress_event": true})
 
-        console.log("value after refresh", this.model.value)
-        console.log("data after refresh", this._jstree.jstree(true).settings.core.data)
+        // console.log("value after refresh", this.model.value)
+        // console.log("data after refresh", this._jstree.jstree(true).settings.core.data)
     }
 
     _setShowIcons(): void {
-        console.log("setShowIcons")
+        // console.log("setShowIcons")
         if (this.model.show_icons) {
             this._jstree.jstree(true).show_icons ( );
         }
@@ -160,7 +156,7 @@ export class jsTreePlotView extends HTMLBoxView {
         }
     }
     _setShowDots(): void {
-        console.log("setShowDots")
+        // console.log("setShowDots")
         if (this.model.show_dots) {
             this._jstree.jstree(true).show_dots ( );
         }
@@ -170,7 +166,7 @@ export class jsTreePlotView extends HTMLBoxView {
     }
 
     setCheckboxes(): void {
-        console.log("setCheckBoxes")
+        // console.log("setCheckBoxes")
         if (this.model.checkbox) {
             this._jstree.jstree(true).show_checkboxes();
         }
@@ -180,7 +176,7 @@ export class jsTreePlotView extends HTMLBoxView {
     }
 
     _setMultiple(): void {
-        console.log("setMultiple")
+        // console.log("setMultiple")
         this._jstree.jstree(true).settings.core.multiple = this.model.multiple
     }
 
@@ -189,13 +185,13 @@ export class jsTreePlotView extends HTMLBoxView {
     }
 
     _listen_for_node_open({}, data: any): void {
-        console.log("listen for node open")
+        // console.log("listen for node open")
         data.node = this.add_node_children(data.node)
         this.model._last_opened = data.node
     }
 
     add_node_children(node: Node): Node {
-        console.log("add node children")
+        // console.log("add node children")
         node["children_nodes"] = [];
         for (let child of node.children){
             node.children_nodes.push(this._jstree.jstree(true).get_node(child))

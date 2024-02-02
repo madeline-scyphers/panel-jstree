@@ -45,7 +45,6 @@ def test_base_tree_app():
     """Construct a BaseTree for manual testing"""
     tree = Tree(
         data=A,
-        drag_and_drop=True
     )
 
     settings = pn.Param(
@@ -68,7 +67,7 @@ def test_base_tree_app():
     return pn.template.FastListTemplate(
         site="Panel jsTree",
         title="Simple Tree Editor",
-        main=[tree, button],
+        main=[pn.Card(tree), button],
         sidebar=[settings],
     )
 
