@@ -40,15 +40,20 @@ def test_flat_tree_app(test_dir="."):
         ]
     )
     text_input = pn.widgets.TextInput(name="Text Input", placeholder="Enter a file path here...")
+    button = pn.widgets.Button(name="change direcrory")
 
     @pn.depends(text_input, watch=True)
     def text_box_cb(val):
         ft.value = [val]
 
+    @pn.depends(button, watch=True)
+    def cb(*event):
+        ft.directory = text_input.value
+
     return pn.template.FastListTemplate(
         site="Panel jsTree",
         title="FileTree Editor",
-        main=[ft, text_input],
+        main=[ft, text_input, button],
         sidebar=[settings],
     )
 

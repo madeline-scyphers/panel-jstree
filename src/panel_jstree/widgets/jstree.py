@@ -278,7 +278,17 @@ class FileTree(_TreeBase):
         self._folder_icon = "jstree-folder"
 
         super().__init__(_get_children_cb=self._get_children, _get_parents_cb=lambda value: list(map(str, Path(value).parents)), **params)
-        self._data = [{"id": self.directory,
+        self.param.watch(self._set_data_from_directory, "directory")
+        self._set_data_from_directory()
+        # self._data = [{"id": self.directory,
+        #                "text": Path(self.directory).name,
+        #                "icon": self._folder_icon,
+        #                "state": {"opened": True},
+        #                "children": self._get_children_cb(Path(self.directory).name, self.directory,  depth=1)
+        #                }]
+
+    def _set_data_from_directory(self, *event):
+        self._data = [{"id": fullpath(self.directory),
                        "text": Path(self.directory).name,
                        "icon": self._folder_icon,
                        "state": {"opened": True},
