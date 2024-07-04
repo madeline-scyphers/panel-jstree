@@ -49,13 +49,6 @@ export class jsTreePlotView extends HTMLBoxView {
         set_size(this._container, this.model)
         this.shadow_el.appendChild(this._container);
         // console.log(this._container)
-
-        let kw: {[k: string]: any} = {"checkbox": {
-            "three_state": false,
-            "cascade": "undetermined"
-        }}
-
-        // console.log("plugins: ", this.model.plugins)
         if (this.model.checkbox && !this.model.plugins.includes("checkbox")) {
             this.model.plugins.push("checkbox")
         }
@@ -70,7 +63,11 @@ export class jsTreePlotView extends HTMLBoxView {
                   }
                 },
                 "plugins": this.model.plugins,
-                ...kw
+                checkbox: {
+                    three_state: this.model.cascade_setting == "" ? this.model.cascade : false,
+                    cascade: this.model.cascade_setting == "" ? "up+down+undetermined" : this.model.cascade_setting,
+                    cascade_to_disabled: false,
+                  }
             }
             );
         this.init_callbacks()
@@ -210,7 +207,8 @@ export namespace jsTreePlot {
     multiple: p.Property<boolean>
     show_icons: p.Property<boolean>
     show_dots: p.Property<boolean>
-    drag_and_drop: p.Property<boolean>
+    cascade: p.Property<boolean>
+    cascade_setting: p.Property<any>
     value: p.Property<any>
     _last_opened: p.Property<any>
     _new_nodes: p.Property<any>
@@ -240,7 +238,8 @@ export class jsTreePlot extends HTMLBox {
         multiple:      [ Boolean, true ],
         show_icons:    [ Boolean, true ],
         show_dots:     [ Boolean, true ],
-        drag_and_drop:     [ Boolean, false ],
+        cascade:       [ Boolean, true ],
+        cascade_setting:       [ Any, "" ],
         _last_opened: [ Any, {} ],
         _new_nodes: [ Array(Any), [] ],
         _flat_tree: [ Array(Any), []     ],

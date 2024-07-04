@@ -55,6 +55,21 @@ class _TreeBase(Widget):
         "to jsTree."
     )
 
+    cascade = param.Boolean(
+        default=True, doc="Whether to cascade selections up and down the tree, "
+                          "only applicable if checkbox is True "
+                          "Use cascade or cascade_setting, not both"
+    )
+
+    cascade_setting = param.String(
+        default="", doc="The exact jsTree cascade setting to use. "
+                        "Only applicable if checkbox is True "
+                        "Specifying  cascade_setting will override cascade. "
+                        "Options are: 'up', 'down', 'undetermined', "
+                        "'up+down', 'up+undetermined', 'down+undetermined', "
+                        "'up+down+undetermined'"
+    )
+
     _get_children_cb = param.Callable(
         doc="Function that is called to load new children nodes. "
             "First argument should be the text representation of the parent,"
@@ -116,6 +131,24 @@ class _TreeBase(Widget):
             properties["height"] = 100
 
         properties["value"] = self._values
+
+        if properties.get("cascade_setting"):
+            if properties["cascade_setting"] not in (
+                "up",
+                "down",
+                "undetermined",
+                "up+down",
+                "up+undetermined",
+                "down+undetermined",
+                "up+down+undetermined",
+            ):
+                raise ValueError(
+                    "cascade_setting must be one of 'up', 'down', 'undetermined', "
+                    "'up+down', 'up+undetermined', 'down+undetermined', "
+                    "'up+down+undetermined'"
+                )
+            properties["cascade"] = False
+
         return properties
 
     def add_children_on_new_values(self, *event):

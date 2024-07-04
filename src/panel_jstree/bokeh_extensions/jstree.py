@@ -42,6 +42,8 @@ class jsTreePlot(HTMLBox):
     multiple = Bool(default=True)
     show_icons = Bool(default=True)
     show_dots = Bool(default=True)
+    cascade = Bool(default=True)
+    cascade_setting = String()
     _last_opened = Dict(String, Any)
     _new_nodes = List(Any)
     _flat_tree = List(Any)
